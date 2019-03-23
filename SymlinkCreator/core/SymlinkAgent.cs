@@ -56,6 +56,7 @@ namespace SymlinkCreator.core
                                     DateTime.Now.Ticks.ToString() + ".bat";
             ScriptExecutor scriptExecutor = new ScriptExecutor(scriptFileName);
 
+            scriptExecutor.WriteLine(_splittedDestinationPath[0]);
             scriptExecutor.WriteLine("cd \"" + _destinationPath + "\"");
 
             foreach (string sourceFilePath in _sourceFileList)
