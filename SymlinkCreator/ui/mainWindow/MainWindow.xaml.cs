@@ -49,7 +49,7 @@ namespace SymlinkCreator.ui.mainWindow
 
         #region control event handles
 
-        private void AddButton_OnClick(object sender, RoutedEventArgs e)
+        private void AddFilesButton_OnClick(object sender, RoutedEventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Multiselect = true;
@@ -57,7 +57,20 @@ namespace SymlinkCreator.ui.mainWindow
 
             if (result == true)
             {
-                AddToSourceFileList(fileDialog.FileNames);
+                AddToSourceFileOrFolderList(fileDialog.FileNames);
+            }
+        }
+
+        private void AddFolderButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                DialogResult result = folderBrowserDialog.ShowDialog();
+
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    AddToSourceFileOrFolderList(folderBrowserDialog.SelectedPath);
+                }
             }
         }
 
@@ -82,10 +95,10 @@ namespace SymlinkCreator.ui.mainWindow
             MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
             if (mainWindowViewModel == null) return;
 
-            List<string> selectedFileList = SourceFileListView.SelectedItems.Cast<string>().ToList();
-            foreach (var selectedItem in selectedFileList)
+            List<string> selectedFileOrFolderList = SourceFileOrFolderListView.SelectedItems.Cast<string>().ToList();
+            foreach (var selectedItem in selectedFileOrFolderList)
             {
-                mainWindowViewModel.FileList.Remove(selectedItem);
+                mainWindowViewModel.FileOrFolderList.Remove(selectedItem);
             }
         }
 
@@ -93,15 +106,15 @@ namespace SymlinkCreator.ui.mainWindow
         {
             MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
 
-            mainWindowViewModel?.FileList.Clear();
+            mainWindowViewModel?.FileOrFolderList.Clear();
         }
 
-        private void SourceFileListView_OnDrop(object sender, DragEventArgs e)
+        private void SourceFileOrFolderListView_OnDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] droppedFileList = (string[]) e.Data.GetData(DataFormats.FileDrop);
-                AddToSourceFileList(droppedFileList);
+                string[] droppedFileOrFolderList = (string[]) e.Data.GetData(DataFormats.FileDrop);
+                AddToSourceFileOrFolderList(droppedFileOrFolderList);
             }
         }
 
@@ -129,7 +142,7 @@ namespace SymlinkCreator.ui.mainWindow
             if (mainWindowViewModel == null) return;
 
             SymlinkAgent symlinkAgent = new SymlinkAgent(
-                mainWindowViewModel.FileList,
+                mainWindowViewModel.FileOrFolderList,
                 mainWindowViewModel.DestinationPath,
                 mainWindowViewModel.ShouldUseRelativePath,
                 mainWindowViewModel.ShouldRetainScriptFile);
@@ -157,18 +170,28 @@ namespace SymlinkCreator.ui.mainWindow
 
         #region helper methods
 
-        private void AddToSourceFileList(IEnumerable<string> fileList)
+        private void AddToSourceFileOrFolderList(IEnumerable<string> fileOrFolderList)
         {
             MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
             if (mainWindowViewModel == null) return;
 
-            foreach (string file in fileList)
+            foreach (string fileOrFolder in fileOrFolderList)
             {
-                if (!mainWindowViewModel.FileList.Contains(file))
+                if (!mainWindowViewModel.FileOrFolderList.Contains(fileOrFolder))
                 {
-                    if (File.Exists(file))
-                        mainWindowViewModel.FileList.Add(file);
+                    mainWindowViewModel.FileOrFolderList.Add(fileOrFolder);
                 }
+            }
+        }
+
+        private void AddToSourceFileOrFolderList(string fileOrFolderPath)
+        {
+            MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
+            if (mainWindowViewModel == null) return;
+
+            if (!mainWindowViewModel.FileOrFolderList.Contains(fileOrFolderPath))
+            {
+                mainWindowViewModel.FileOrFolderList.Add(fileOrFolderPath);
             }
         }
 

@@ -10,16 +10,18 @@
         d:DataContext="{d:DesignData Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}"
         Title="{x:Static core:ApplicationConfiguration.ApplicationName}"
         MinWidth="600"
-        MinHeight="250"
+        MinHeight="300"
         Width="600"
         Height="300">
     <Window.Resources>
         <Thickness x:Key="DefaultMargin">5</Thickness>
         <system:Double x:Key="DefaultMinButtonWidth">80</system:Double>
+        <system:Double x:Key="DefaultMinButtonHeight">20</system:Double>
 
         <Style TargetType="Button">
             <Setter Property="Margin" Value="{StaticResource DefaultMargin}" />
             <Setter Property="MinWidth" Value="{StaticResource DefaultMinButtonWidth}" />
+            <Setter Property="MinHeight" Value="{StaticResource DefaultMinButtonHeight}" />
         </Style>
 
         <Style TargetType="TextBlock">
@@ -53,10 +55,10 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="Source file list:" />
+            <TextBlock Grid.Row="0" Text="Source file or folder list:" />
 
-            <ListView Grid.Row="1" x:Name="SourceFileListView" ItemsSource="{Binding FileList}"
-                      AllowDrop="True" Drop="SourceFileListView_OnDrop">
+            <ListView Grid.Row="1" x:Name="SourceFileOrFolderListView" ItemsSource="{Binding FileOrFolderList}"
+                      AllowDrop="True" Drop="SourceFileOrFolderListView_OnDrop">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding}" ToolTip="{Binding}" />
@@ -65,7 +67,16 @@
             </ListView>
 
             <DockPanel Grid.Row="2" LastChildFill="False">
-                <Button DockPanel.Dock="Left" Content="Add files" Click="AddButton_OnClick" />
+                <DockPanel.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                        <Setter Property="MaxHeight" Value="{StaticResource DefaultMinButtonHeight}" />
+                    </Style>
+                </DockPanel.Resources>
+
+                <StackPanel DockPanel.Dock="Left">
+                    <Button Content="Add files" Click="AddFilesButton_OnClick" />
+                    <Button Content="Add folder" Click="AddFolderButton_OnClick" />
+                </StackPanel>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Button Content="Delete selected" Click="DeleteSelectedButton_OnClick" />
@@ -122,7 +133,8 @@
                     </StackPanel>
                 </Button>
 
-                <Button Content="About" Click="AboutButton_OnClick" />
+                <Button Content="About" MaxHeight="{StaticResource DefaultMinButtonHeight}"
+                        Click="AboutButton_OnClick" />
             </DockPanel>
         </Grid>
     </Grid>

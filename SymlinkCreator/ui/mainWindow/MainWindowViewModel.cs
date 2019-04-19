@@ -9,7 +9,7 @@ namespace SymlinkCreator.ui.mainWindow
     {
         #region properties
 
-        public ObservableCollection<string> FileList { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<string> FileOrFolderList { get; set; } = new ObservableCollection<string>();
 
         private string _destinationPath;
         public string DestinationPath

@@ -11,7 +11,7 @@ namespace SymlinkCreator.core
     {
         #region members
 
-        private readonly List<string> _sourceFileList;
+        private readonly List<string> _sourceFileOrFolderList;
         private string _destinationPath;
         private readonly bool _shouldUseRelativePath;
         private readonly bool _shouldRetainScriptFile;
@@ -23,10 +23,10 @@ namespace SymlinkCreator.core
 
         #region constructor
 
-        public SymlinkAgent(IEnumerable<string> sourceFileList, string destinationPath,
+        public SymlinkAgent(IEnumerable<string> sourceFileOrFolderList, string destinationPath,
             bool shouldUseRelativePath = true, bool shouldRetainScriptFile = false)
         {
-            this._sourceFileList = sourceFileList.ToList();
+            this._sourceFileOrFolderList = sourceFileOrFolderList.ToList();
             this._destinationPath = destinationPath;
             this._shouldUseRelativePath = shouldUseRelativePath;
             this._shouldRetainScriptFile = shouldRetainScriptFile;
@@ -59,7 +59,7 @@ namespace SymlinkCreator.core
             scriptExecutor.WriteLine(_splittedDestinationPath[0]);
             scriptExecutor.WriteLine("cd \"" + _destinationPath + "\"");
 
-            foreach (string sourceFilePath in _sourceFileList)
+            foreach (string sourceFilePath in _sourceFileOrFolderList)
             {
                 string[] splittedSourceFilePath = GetSplittedPath(sourceFilePath);
 
@@ -73,8 +73,12 @@ namespace SymlinkCreator.core
                     }
                 }
 
-                scriptExecutor.WriteLine("mklink \"" + splittedSourceFilePath.Last() + "\" \"" +
-                                         commandLineTargetPath + "\"");
+                scriptExecutor.Write("mklink ");
+                if (Directory.Exists(sourceFilePath))
+                    scriptExecutor.Write("/d ");
+
+                scriptExecutor.WriteLine("\"" + splittedSourceFilePath.Last() + "\" " +
+                                         "\"" + commandLineTargetPath + "\"");
             }
 
             scriptExecutor.ExecuteAsAdmin();
