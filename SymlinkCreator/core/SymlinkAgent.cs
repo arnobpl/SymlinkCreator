@@ -56,6 +56,10 @@ namespace SymlinkCreator.core
                                     DateTime.Now.Ticks.ToString() + ".bat";
             ScriptExecutor scriptExecutor = new ScriptExecutor(scriptFileName);
 
+            // set code page to UTF-8 to support unicode file paths
+            scriptExecutor.WriteLine("chcp 65001 >NUL");
+
+            // go to destination path
             scriptExecutor.WriteLine(_splittedDestinationPath[0]);
             scriptExecutor.WriteLine("cd \"" + _destinationPath + "\"");
 
