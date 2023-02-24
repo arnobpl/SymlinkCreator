@@ -30,6 +30,13 @@ namespace SymlinkCreator.ui.mainWindow
         #endregion
 
 
+        #region fields
+
+        private string _previouslySelectedFolderPath = "";
+
+        #endregion
+
+
         #region window event handles
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -51,8 +58,10 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void AddFilesButton_OnClick(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Multiselect = true;
+            OpenFileDialog fileDialog = new OpenFileDialog
+            {
+                Multiselect = true
+            };
             bool? result = fileDialog.ShowDialog();
 
             if (result == true)
@@ -65,11 +74,13 @@ namespace SymlinkCreator.ui.mainWindow
         {
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
             {
+                folderBrowserDialog.SelectedPath = _previouslySelectedFolderPath;
                 DialogResult result = folderBrowserDialog.ShowDialog();
 
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     AddToSourceFileOrFolderList(folderBrowserDialog.SelectedPath);
+                    _previouslySelectedFolderPath = folderBrowserDialog.SelectedPath;
                 }
             }
         }
