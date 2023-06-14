@@ -158,9 +158,15 @@ namespace SymlinkCreator.ui.mainWindow
                 mainWindowViewModel.ShouldUseRelativePath,
                 mainWindowViewModel.ShouldRetainScriptFile);
 
-            symlinkAgent.CreateSymlinks();
-
-            MessageBox.Show("Execution completed.", "Done!", MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                symlinkAgent.CreateSymlinks();
+                MessageBox.Show("Execution completed.", "Done!", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Show(ex.Message + ":\n" + ex.FileName, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void AboutButton_OnClick(object sender, RoutedEventArgs e)

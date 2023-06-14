@@ -42,8 +42,7 @@ namespace SymlinkCreator.core
             // check for destination path
             if (!Directory.Exists(_destinationPath))
             {
-                Debug.WriteLine("Destination path does not exist: " + _destinationPath);
-                return;
+                throw new FileNotFoundException("Destination path does not exist", _destinationPath);
             }
 
             // remove the last '\' character from the path if exists
