@@ -4,13 +4,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Forms;
 using SymlinkCreator.core;
 using SymlinkCreator.ui.utility;
 using DataFormats = System.Windows.DataFormats;
 using DragEventArgs = System.Windows.DragEventArgs;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Microsoft.WindowsAPICodePack.Shell;
+using Microsoft.WindowsAPICodePack.Dialogs;
+
 
 namespace SymlinkCreator.ui.mainWindow
 {
@@ -72,16 +74,21 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void AddFolderButton_OnClick(object sender, RoutedEventArgs e)
         {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                folderBrowserDialog.SelectedPath = _previouslySelectedFolderPath;
-                DialogResult result = folderBrowserDialog.ShowDialog();
+            
+            var openFileDialog = new CommonOpenFileDialog();
+            openFileDialog.IsFolderPicker = true;
+            openFileDialog.InitialDirectory = _previouslySelectedFolderPath;
 
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    AddToSourceFileOrFolderList(folderBrowserDialog.SelectedPath);
-                    _previouslySelectedFolderPath = folderBrowserDialog.SelectedPath;
-                }
+            if (openFileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                string selectedFolder = openFileDialog.FileName;
+                AddToSourceFileOrFolderList(selectedFolder);
+                _previouslySelectedFolderPath = selectedFolder;
+                Console.WriteLine($"Selected Folder: {selectedFolder}");
+            }
+            else
+            {
+                Console.WriteLine("User canceled the operation.");
             }
         }
 
@@ -90,15 +97,16 @@ namespace SymlinkCreator.ui.mainWindow
             MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
             if (mainWindowViewModel == null) return;
 
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                DialogResult result = folderBrowserDialog.ShowDialog();
+            var openFileDialog = new CommonOpenFileDialog();
+            openFileDialog.IsFolderPicker = true;
+            openFileDialog.InitialDirectory = _previouslySelectedFolderPath;
 
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    mainWindowViewModel.DestinationPath = folderBrowserDialog.SelectedPath;
-                }
+            if (openFileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                string selectedFolder = openFileDialog.FileName;
+                mainWindowViewModel.DestinationPath = selectedFolder;                
             }
+
         }
 
         private void DeleteSelectedButton_OnClick(object sender, RoutedEventArgs e)
