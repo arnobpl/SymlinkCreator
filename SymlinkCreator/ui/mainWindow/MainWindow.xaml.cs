@@ -1,16 +1,17 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using SymlinkCreator.core;
+using SymlinkCreator.ui.utility;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Forms;
-using SymlinkCreator.core;
-using SymlinkCreator.ui.utility;
 using DataFormats = System.Windows.DataFormats;
 using DragEventArgs = System.Windows.DragEventArgs;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+
 
 namespace SymlinkCreator.ui.mainWindow
 {
@@ -32,7 +33,8 @@ namespace SymlinkCreator.ui.mainWindow
 
         #region fields
 
-        private string _previouslySelectedFolderPath = "";
+        private string _previouslySelectedAddFolderPath = "";
+        private string _previouslySelectedDestinationFolderPath = "";
 
         #endregion
 
@@ -72,16 +74,17 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void AddFolderButton_OnClick(object sender, RoutedEventArgs e)
         {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                folderBrowserDialog.SelectedPath = _previouslySelectedFolderPath;
-                DialogResult result = folderBrowserDialog.ShowDialog();
 
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    AddToSourceFileOrFolderList(folderBrowserDialog.SelectedPath);
-                    _previouslySelectedFolderPath = folderBrowserDialog.SelectedPath;
-                }
+            CommonOpenFileDialog folderBrowserDialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true,
+                InitialDirectory = _previouslySelectedAddFolderPath
+            };
+
+            if (folderBrowserDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                AddToSourceFileOrFolderList(folderBrowserDialog.FileName);
+                _previouslySelectedAddFolderPath = folderBrowserDialog.FileName;
             }
         }
 
@@ -90,14 +93,16 @@ namespace SymlinkCreator.ui.mainWindow
             MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
             if (mainWindowViewModel == null) return;
 
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            CommonOpenFileDialog folderBrowserDialog = new CommonOpenFileDialog
             {
-                DialogResult result = folderBrowserDialog.ShowDialog();
+                IsFolderPicker = true,
+                InitialDirectory = _previouslySelectedDestinationFolderPath
+            };
 
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    mainWindowViewModel.DestinationPath = folderBrowserDialog.SelectedPath;
-                }
+            if (folderBrowserDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                mainWindowViewModel.DestinationPath = folderBrowserDialog.FileName;
+                _previouslySelectedDestinationFolderPath = folderBrowserDialog.FileName;
             }
         }
 
@@ -124,7 +129,7 @@ namespace SymlinkCreator.ui.mainWindow
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] droppedFileOrFolderList = (string[]) e.Data.GetData(DataFormats.FileDrop);
+                string[] droppedFileOrFolderList = (string[])e.Data.GetData(DataFormats.FileDrop);
                 AddToSourceFileOrFolderList(droppedFileOrFolderList);
             }
         }
@@ -133,7 +138,7 @@ namespace SymlinkCreator.ui.mainWindow
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] pathList = (string[]) e.Data.GetData(DataFormats.FileDrop);
+                string[] pathList = (string[])e.Data.GetData(DataFormats.FileDrop);
                 if (pathList != null)
                 {
                     string droppedDestinationPath = pathList[0];

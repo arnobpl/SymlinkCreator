@@ -1,7 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using SymlinkCreator.Properties;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using SymlinkCreator.Properties;
 
 namespace SymlinkCreator.ui.mainWindow
 {

@@ -81,7 +81,7 @@ namespace SymlinkCreator.core
 
         #region web addresses
 
-        public static string CompanyWebAddress => "https://github.com/arnobpl";
+        public static string CompanyWebAddress => "https://github.com/arnobpl/SymlinkCreator";
 
         #endregion
     }
