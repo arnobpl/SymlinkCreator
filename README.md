@@ -1,6 +1,11 @@
 # SymlinkCreator
 SymlinkCreator is a GUI app for creating symbolic links (symlinks), and it is based on `mklink` command. You can create multiple symlinks at a time.
 
+## Walkthrough video
+<a href="https://www.youtube.com/watch?v=1Ad2Qymz5hI" target="_blank">
+  <img src="https://i.ytimg.com/vi/1Ad2Qymz5hI/sddefault.jpg" width="600" alt="Walkthrough SymlinkCreator" title="Walkthrough SymlinkCreator - Click to Watch"/>
+</a>
+
 ## Use cases
 - Suppose, you have a collection of several songs sorted by artists and albums in your PC. You might want a separate collection of your most favorite songs which you will store in your mobile devices. In this scenario, the traditional shortcut option through Windows Explorer right-click context menu is not enough, because you cannot copy the actual file contents by copying the traditional shortcut files (*\*.lnk*). You might consider duplicating the files which you will store in your mobile devices. But it will waste your storage space of your PC. In this case, SymlinkCreator will come in handy. You can easily create the separate collection of songs and transfer them to your mobile devices, without wasting your PC's storage space.
 
