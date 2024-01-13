@@ -36,6 +36,19 @@ namespace SymlinkCreator.core
             }
         }
 
+        private static string _applicationFileName;
+        public static string ApplicationFileName
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_applicationFileName))
+                    return _applicationFileName;
+
+                _applicationFileName = Assembly.GetExecutingAssembly().GetName().Name;
+                return _applicationFileName;
+            }
+        }
+
         private static string _applicationVersion;
         public static string ApplicationVersion
         {

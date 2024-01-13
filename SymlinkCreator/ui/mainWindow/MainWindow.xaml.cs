@@ -89,8 +89,7 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void DestinationPathBrowseButton_OnClick(object sender, RoutedEventArgs e)
         {
-            MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
-            if (mainWindowViewModel == null) return;
+            if (!(this.DataContext is MainWindowViewModel mainWindowViewModel)) return;
 
             CommonOpenFileDialog folderBrowserDialog = new CommonOpenFileDialog
             {
@@ -107,8 +106,7 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void DeleteSelectedButton_OnClick(object sender, RoutedEventArgs e)
         {
-            MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
-            if (mainWindowViewModel == null) return;
+            if (!(this.DataContext is MainWindowViewModel mainWindowViewModel)) return;
 
             List<string> selectedFileOrFolderList = SourceFileOrFolderListView.SelectedItems.Cast<string>().ToList();
             foreach (var selectedItem in selectedFileOrFolderList)
@@ -153,8 +151,7 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void CreateSymlinksButton_OnClick(object sender, RoutedEventArgs e)
         {
-            MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
-            if (mainWindowViewModel == null) return;
+            if (!(this.DataContext is MainWindowViewModel mainWindowViewModel)) return;
 
             SymlinkAgent symlinkAgent = new SymlinkAgent(
                 mainWindowViewModel.FileOrFolderList,
@@ -165,11 +162,11 @@ namespace SymlinkCreator.ui.mainWindow
             try
             {
                 symlinkAgent.CreateSymlinks();
-                MessageBox.Show("Execution completed.", "Done!", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(this, "Execution completed.", "Done!", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            catch (FileNotFoundException ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + ":\n" + ex.FileName, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(this, ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -193,8 +190,7 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void AddToSourceFileOrFolderList(IEnumerable<string> fileOrFolderList)
         {
-            MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
-            if (mainWindowViewModel == null) return;
+            if (!(this.DataContext is MainWindowViewModel mainWindowViewModel)) return;
 
             foreach (string fileOrFolder in fileOrFolderList)
             {
@@ -207,8 +203,7 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void AddToSourceFileOrFolderList(string fileOrFolderPath)
         {
-            MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
-            if (mainWindowViewModel == null) return;
+            if (!(this.DataContext is MainWindowViewModel mainWindowViewModel)) return;
 
             if (!mainWindowViewModel.FileOrFolderList.Contains(fileOrFolderPath))
             {
@@ -218,8 +213,7 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void AssignDestinationPath(string destinationPath)
         {
-            MainWindowViewModel mainWindowViewModel = this.DataContext as MainWindowViewModel;
-            if (mainWindowViewModel == null) return;
+            if (!(this.DataContext is MainWindowViewModel mainWindowViewModel)) return;
 
             if (Directory.Exists(destinationPath))
                 mainWindowViewModel.DestinationPath = destinationPath;

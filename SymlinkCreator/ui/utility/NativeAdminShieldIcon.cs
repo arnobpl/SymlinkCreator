@@ -33,8 +33,10 @@ namespace SymlinkCreator.ui.utility
 
             if (Environment.OSVersion.Version.Major >= 6)
             {
-                SHSTOCKICONINFO sii = new SHSTOCKICONINFO();
-                sii.cbSize = (UInt32)Marshal.SizeOf(typeof(SHSTOCKICONINFO));
+                SHSTOCKICONINFO sii = new SHSTOCKICONINFO
+                {
+                    cbSize = (UInt32)Marshal.SizeOf(typeof(SHSTOCKICONINFO))
+                };
 
                 Marshal.ThrowExceptionForHR(SHGetStockIconInfo(SHSTOCKICONID.SIID_SHIELD,
                     SHGSI.SHGSI_ICON | SHGSI.SHGSI_SMALLICON,

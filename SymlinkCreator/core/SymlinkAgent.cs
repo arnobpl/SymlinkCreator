@@ -50,8 +50,28 @@ namespace SymlinkCreator.core
 
             _splittedDestinationPath = GetSplittedPath(_destinationPath);
 
-            string scriptFileName = ApplicationConfiguration.ApplicationName + "_" +
-                                    DateTime.Now.Ticks.ToString() + ".bat";
+            string scriptFileName = ApplicationConfiguration.ApplicationFileName + "_" +
+                                    DateTime.Now.Ticks.ToString() + ".cmd";
+
+            ScriptExecutor scriptExecutor = PrepareScriptExecutor(scriptFileName);
+            scriptExecutor.ExecuteAsAdmin();
+
+            if (!_shouldRetainScriptFile)
+                File.Delete(scriptFileName);
+
+            if (scriptExecutor.ExitCode != 0)
+            {
+                throw new ApplicationException("Symlink script exited with an error.\n" + scriptExecutor.StandardError);
+            }
+        }
+
+        #endregion
+
+
+        #region helper methods
+
+        private ScriptExecutor PrepareScriptExecutor(string scriptFileName)
+        {
             ScriptExecutor scriptExecutor = new ScriptExecutor(scriptFileName);
 
             // set code page to UTF-8 to support unicode file paths
@@ -83,16 +103,8 @@ namespace SymlinkCreator.core
                                          "\"" + commandLineTargetPath + "\"");
             }
 
-            scriptExecutor.ExecuteAsAdmin();
-
-            if (!_shouldRetainScriptFile)
-                File.Delete(scriptFileName);
+            return scriptExecutor;
         }
-
-        #endregion
-
-
-        #region helper methods
 
         private string[] GetSplittedPath(string path)
         {
@@ -134,11 +146,6 @@ namespace SymlinkCreator.core
                 relativePathStringBuilder.Length--;
 
             return relativePathStringBuilder.ToString();
-        }
-
-        private string GetRelativePath(string currentPath, string targetPath)
-        {
-            return GetRelativePath(GetSplittedPath(currentPath), GetSplittedPath(targetPath));
         }
 
         #endregion
