@@ -74,7 +74,6 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void AddFolderButton_OnClick(object sender, RoutedEventArgs e)
         {
-
             CommonOpenFileDialog folderBrowserDialog = new CommonOpenFileDialog
             {
                 IsFolderPicker = true,
