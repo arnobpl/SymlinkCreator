@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace SymlinkCreator.core
@@ -44,6 +45,18 @@ namespace SymlinkCreator.core
                 File.Create(stderrFileName).Dispose();
                 CreateWrapperScript(wrapperScriptFileName, stderrFileName);
                 ExecuteWrapperScript(wrapperScriptFileName, stderrFileName);
+            }
+            catch (Exception ex)
+            {
+                if (StandardError.Length > 0)
+                {
+                    StandardError += "\n";
+                }
+                StandardError += ex.ToString();
+                if (ExitCode == 0)
+                {
+                    ExitCode = -1;
+                }
             }
             finally
             {
