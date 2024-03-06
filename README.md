@@ -23,3 +23,8 @@ Symlink Creator uses `mklink` command to create symlinks. Symlink Creator first 
 
 ## Why Symlink Creator needs administrative rights
 It has been stated before that Symlink Creator uses `mklink` command to create symlinks. `mklink` command requires administrative privilege to create symlinks. You can find more information [here](https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/create-symbolic-links).
+
+## Donation
+If you enjoy using Symlink Creator and also want to buy me a cup of tea, you are most welcome. You can send me a gift here: [PayPal](https://paypal.me/arnobpl)
+
+Thank you for using Symlink Creator and sharing feedback. Happy Symlinking!

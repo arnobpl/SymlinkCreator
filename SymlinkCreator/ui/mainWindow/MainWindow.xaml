@@ -75,7 +75,7 @@
 
                 <StackPanel DockPanel.Dock="Left">
                     <Button Content="Add files" Click="AddFilesButton_OnClick" />
-                    <Button Content="Add folder" Click="AddFolderButton_OnClick" />
+                    <Button Content="Add folders" Click="AddFoldersButton_OnClick" />
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">

@@ -33,7 +33,6 @@ namespace SymlinkCreator.ui.mainWindow
 
         #region fields
 
-        private string _previouslySelectedAddFolderPath = "";
         private string _previouslySelectedDestinationFolderPath = "";
 
         #endregion
@@ -64,26 +63,24 @@ namespace SymlinkCreator.ui.mainWindow
             {
                 Multiselect = true
             };
-            bool? result = fileDialog.ShowDialog();
 
-            if (result == true)
+            if (fileDialog.ShowDialog() == true)
             {
                 AddToSourceFileOrFolderList(fileDialog.FileNames);
             }
         }
 
-        private void AddFolderButton_OnClick(object sender, RoutedEventArgs e)
+        private void AddFoldersButton_OnClick(object sender, RoutedEventArgs e)
         {
             CommonOpenFileDialog folderBrowserDialog = new CommonOpenFileDialog
             {
                 IsFolderPicker = true,
-                InitialDirectory = _previouslySelectedAddFolderPath
+                Multiselect = true
             };
 
             if (folderBrowserDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                AddToSourceFileOrFolderList(folderBrowserDialog.FileName);
-                _previouslySelectedAddFolderPath = folderBrowserDialog.FileName;
+                AddToSourceFileOrFolderList(folderBrowserDialog.FileNames);
             }
         }
 
@@ -198,16 +195,6 @@ namespace SymlinkCreator.ui.mainWindow
                 {
                     mainWindowViewModel.FileOrFolderList.Add(fileOrFolder);
                 }
-            }
-        }
-
-        private void AddToSourceFileOrFolderList(string fileOrFolderPath)
-        {
-            if (!(this.DataContext is MainWindowViewModel mainWindowViewModel)) return;
-
-            if (!mainWindowViewModel.FileOrFolderList.Contains(fileOrFolderPath))
-            {
-                mainWindowViewModel.FileOrFolderList.Add(fileOrFolderPath);
             }
         }
 
