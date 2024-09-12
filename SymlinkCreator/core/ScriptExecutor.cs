@@ -21,6 +21,7 @@ namespace SymlinkCreator.core
         public ScriptExecutor(string fileName) : base(fileName)
         {
             this._fileName = fileName;
+            AddUnicodeSupport(this);
         }
 
         #endregion
@@ -73,6 +74,7 @@ namespace SymlinkCreator.core
         private void CreateWrapperScript(string wrapperScriptFileName, string stderrFileName)
         {
             StreamWriter wrapperScriptStreamWriter = new StreamWriter(wrapperScriptFileName);
+            AddUnicodeSupport(wrapperScriptStreamWriter);
             // redirect error output to file
             wrapperScriptStreamWriter.WriteLine(
                 "\"" + Path.GetFullPath(this._fileName) + "\" 2> \"" + Path.GetFullPath(stderrFileName) + "\"");
@@ -96,6 +98,12 @@ namespace SymlinkCreator.core
                     this.StandardError = File.ReadAllText(stderrFileName);
                 }
             }
+        }
+
+        private void AddUnicodeSupport(StreamWriter streamWriter)
+        {
+            // set code page to UTF-8 to support unicode file paths
+            streamWriter.WriteLine("chcp 65001 >NUL");
         }
 
         #endregion
