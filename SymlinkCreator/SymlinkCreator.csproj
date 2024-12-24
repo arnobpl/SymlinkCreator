@@ -42,6 +42,9 @@
     <ApplicationIcon>resources\icons\MainIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Costura, Version=5.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Costura.Fody.5.7.0\lib\netstandard1.0\Costura.dll</HintPath>
@@ -224,10 +227,14 @@
     <Compile Include="core\ScriptExecutor.cs" />
     <Compile Include="core\SymlinkAgent.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="ui\aboutWindow\AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ui\mainWindow\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ui\mainWindow\MainWindowViewModel.cs" />
+    <Compile Include="ui\utility\LongPathAware.cs" />
     <Compile Include="ui\utility\NativeAdminShieldIcon.cs" />
     <Compile Include="ui\utility\WindowMaximizeButton.cs" />
   </ItemGroup>
@@ -239,12 +246,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="app.manifest" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="resources\icons\MainIcon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="ui\aboutWindow\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ui\mainWindow\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

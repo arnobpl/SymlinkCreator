@@ -8,11 +8,16 @@
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         d:DataContext="{d:DesignData Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}"
-        Title="{x:Static core:ApplicationConfiguration.ApplicationName}"
         MinWidth="600"
         MinHeight="300"
         Width="600"
         Height="300">
+    <Window.Title>
+        <MultiBinding StringFormat="{}{0} v{1}">
+            <Binding Source="{x:Static core:ApplicationConfiguration.ApplicationName}" />
+            <Binding Source="{x:Static core:ApplicationConfiguration.ApplicationVersion}" />
+        </MultiBinding>
+    </Window.Title>
     <Window.Resources>
         <Thickness x:Key="DefaultMargin">5</Thickness>
         <system:Double x:Key="DefaultMinButtonWidth">80</system:Double>
@@ -74,13 +79,13 @@
                 </DockPanel.Resources>
 
                 <StackPanel DockPanel.Dock="Left">
-                    <Button Content="Add files" Click="AddFilesButton_OnClick" />
-                    <Button Content="Add folders" Click="AddFoldersButton_OnClick" />
+                    <Button Content="Add files" Click="AddFilesButton_OnClick" ToolTip="Add files to the list" />
+                    <Button Content="Add folders" Click="AddFoldersButton_OnClick" ToolTip="Add folders to the list" />
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                    <Button Content="Delete selected" Click="DeleteSelectedButton_OnClick" />
-                    <Button Content="Clear list" Click="ClearListButton_OnClick" />
+                    <Button Content="Remove selected" Click="RemoveSelectedButton_OnClick" ToolTip="Remove selected items from the list" />
+                    <Button Content="Clear list" Click="ClearListButton_OnClick" ToolTip="Clear all items from the list" />
                 </StackPanel>
             </DockPanel>
         </Grid>
@@ -111,7 +116,7 @@
                 <TextBox Grid.Column="0"
                          Text="{Binding DestinationPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTip="{Binding DestinationPath}"
-                         AllowDrop="True" Drop="DestinationPathTextBox_OnDrop"
+                         AllowDrop="True" Drop="DestinationPathTextBox_OnDrop" PreviewDrop="DestinationPathTextBox_OnDrop"
                          PreviewDragOver="DestinationPathTextBox_OnPreviewDragOver" />
 
                 <Button Grid.Column="1" Content="Browse" Click="DestinationPathBrowseButton_OnClick" />
@@ -120,8 +125,15 @@
             <Separator Grid.Row="2" Margin="{StaticResource DefaultMargin}" />
 
             <StackPanel Grid.Row="3">
-                <CheckBox Content="Use relative path if possible" IsChecked="{Binding ShouldUseRelativePath}" />
-                <CheckBox Content="Retain script file after execution" IsChecked="{Binding ShouldRetainScriptFile}" />
+                <CheckBox Content="Use relative path if possible"
+                          IsChecked="{Binding ShouldUseRelativePath}"
+                          ToolTip="Check this to use a relative path if both source and destination are in the same drive." />
+                <CheckBox Content="Retain script file after execution"
+                          IsChecked="{Binding ShouldRetainScriptFile}"
+                          ToolTip="Check this to save the script in the application's location after creating symlinks." />
+                <CheckBox Content="Hide successful operation dialog"
+                          IsChecked="{Binding HideSuccessfulOperationDialog}"
+                          ToolTip="Check this to only show a dialog when an error occurs." />
             </StackPanel>
 
             <DockPanel Grid.Row="4" LastChildFill="False">

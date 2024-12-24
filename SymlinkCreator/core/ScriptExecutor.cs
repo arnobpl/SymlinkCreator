@@ -75,7 +75,7 @@ namespace SymlinkCreator.core
         {
             StreamWriter wrapperScriptStreamWriter = new StreamWriter(wrapperScriptFileName);
             AddUnicodeSupport(wrapperScriptStreamWriter);
-            // redirect error output to file
+            // Redirect error output to file
             wrapperScriptStreamWriter.WriteLine(
                 "\"" + Path.GetFullPath(this._fileName) + "\" 2> \"" + Path.GetFullPath(stderrFileName) + "\"");
             wrapperScriptStreamWriter.Close();
@@ -102,7 +102,7 @@ namespace SymlinkCreator.core
 
         private void AddUnicodeSupport(StreamWriter streamWriter)
         {
-            // set code page to UTF-8 to support unicode file paths
+            // Set code page to UTF-8 to support unicode file paths
             streamWriter.WriteLine("chcp 65001 >NUL");
         }
 

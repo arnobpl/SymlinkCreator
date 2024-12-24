@@ -14,17 +14,6 @@ namespace SymlinkCreator.ui.utility
         #endregion
 
 
-        #region members
-
-        [DllImport("Shell32.dll", SetLastError = false)]
-        private static extern Int32 SHGetStockIconInfo(SHSTOCKICONID siid, SHGSI uFlags, ref SHSTOCKICONINFO psii);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool DestroyIcon(IntPtr hIcon);
-
-        #endregion
-
-
         #region methods
 
         public static BitmapSource GetNativeShieldIcon()
@@ -185,6 +174,17 @@ namespace SymlinkCreator.ui.utility
             public Int32 iIcon;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH)] public string szPath;
         }
+
+        #endregion
+
+
+        #region external methods
+
+        [DllImport("Shell32.dll", SetLastError = false)]
+        private static extern Int32 SHGetStockIconInfo(SHSTOCKICONID siid, SHGSI uFlags, ref SHSTOCKICONINFO psii);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool DestroyIcon(IntPtr hIcon);
 
         #endregion
     }

@@ -38,13 +38,13 @@ namespace SymlinkCreator.core
 
         public void CreateSymlinks()
         {
-            // check for destination path
+            // Check for destination path
             if (!Directory.Exists(_destinationPath))
             {
                 throw new FileNotFoundException("Destination path does not exist", _destinationPath);
             }
 
-            // remove the last '\' character from the path if exists
+            // Remove the last '\' character from the path if exists
             if (_destinationPath[_destinationPath.Length - 1] == '\\')
                 _destinationPath = _destinationPath.Substring(0, _destinationPath.Length - 1);
 
@@ -74,7 +74,7 @@ namespace SymlinkCreator.core
         {
             ScriptExecutor scriptExecutor = new ScriptExecutor(scriptFileName);
 
-            // go to destination path
+            // Go to destination path
             scriptExecutor.WriteLine(_splittedDestinationPath[0]);
             scriptExecutor.WriteLine("cd \"" + _destinationPath + "\"");
 
@@ -85,7 +85,7 @@ namespace SymlinkCreator.core
                 string commandLineTargetPath = sourceFilePath;
                 if (_shouldUseRelativePath)
                 {
-                    // check if both root drives are same
+                    // Check if both root drives are same
                     if (splittedSourceFilePath.First() == _splittedDestinationPath.First())
                     {
                         commandLineTargetPath = GetRelativePath(_splittedDestinationPath, splittedSourceFilePath);

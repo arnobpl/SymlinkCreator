@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -95,6 +96,8 @@ namespace SymlinkCreator.core
         #region web addresses
 
         public static string CompanyWebAddress => "https://github.com/arnobpl/SymlinkCreator";
+
+        public static Uri CompanyWebAddressUri => new Uri(CompanyWebAddress);
 
         #endregion
     }

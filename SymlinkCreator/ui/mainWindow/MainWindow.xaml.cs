@@ -1,11 +1,13 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using SymlinkCreator.core;
+using SymlinkCreator.ui.aboutWindow;
 using SymlinkCreator.ui.utility;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Windows;
 using DataFormats = System.Windows.DataFormats;
 using DragEventArgs = System.Windows.DragEventArgs;
@@ -26,6 +28,17 @@ namespace SymlinkCreator.ui.mainWindow
         {
             InitializeComponent();
             this.Loaded += MainWindow_Loaded;
+
+            if (IsRunningAsAdmin())
+            {
+                MessageBox.Show(
+                    $"Running {this.Title} as an administrator may disable drag-n-drop functionality. " +
+                    "Only symlink creation requires administrative rights. " +
+                    "Please restart the application without administrative privileges to enable drag-n-drop functionality.",
+                    "Warning",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
         }
 
         #endregion
@@ -101,12 +114,12 @@ namespace SymlinkCreator.ui.mainWindow
             }
         }
 
-        private void DeleteSelectedButton_OnClick(object sender, RoutedEventArgs e)
+        private void RemoveSelectedButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (!(this.DataContext is MainWindowViewModel mainWindowViewModel)) return;
 
             List<string> selectedFileOrFolderList = SourceFileOrFolderListView.SelectedItems.Cast<string>().ToList();
-            foreach (var selectedItem in selectedFileOrFolderList)
+            foreach (string selectedItem in selectedFileOrFolderList)
             {
                 mainWindowViewModel.FileOrFolderList.Remove(selectedItem);
             }
@@ -121,34 +134,55 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void SourceFileOrFolderListView_OnDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            string[] droppedFileOrFolderList = GetDroppedFileOrFolderList(e);
+            if (droppedFileOrFolderList != null)
             {
-                string[] droppedFileOrFolderList = (string[])e.Data.GetData(DataFormats.FileDrop);
                 AddToSourceFileOrFolderList(droppedFileOrFolderList);
             }
         }
 
         private void DestinationPathTextBox_OnDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            string[] pathList = GetDroppedFileOrFolderList(e);
+            if (pathList != null)
             {
-                string[] pathList = (string[])e.Data.GetData(DataFormats.FileDrop);
-                if (pathList != null)
-                {
-                    string droppedDestinationPath = pathList[0];
-                    AssignDestinationPath(droppedDestinationPath);
-                }
+                string droppedDestinationPath = pathList[0];
+                AssignDestinationPath(droppedDestinationPath);
+                e.Handled = true;
             }
         }
 
         private void DestinationPathTextBox_OnPreviewDragOver(object sender, DragEventArgs e)
         {
+            string[] pathList = GetDroppedFileOrFolderList(e);
+            if (pathList != null)
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
             e.Handled = true;
         }
 
         private void CreateSymlinksButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (!(this.DataContext is MainWindowViewModel mainWindowViewModel)) return;
+
+            if (mainWindowViewModel.FileOrFolderList.Count == 0)
+            {
+                MessageBox.Show(this, "No files or folders to create symlinks for.", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(mainWindowViewModel.DestinationPath))
+            {
+                MessageBox.Show(this, "Destination path is empty.", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            mainWindowViewModel.DestinationPath = SanitizePath(mainWindowViewModel.DestinationPath);
 
             SymlinkAgent symlinkAgent = new SymlinkAgent(
                 mainWindowViewModel.FileOrFolderList,
@@ -159,7 +193,10 @@ namespace SymlinkCreator.ui.mainWindow
             try
             {
                 symlinkAgent.CreateSymlinks();
-                MessageBox.Show(this, "Execution completed.", "Done!", MessageBoxButton.OK, MessageBoxImage.Information);
+                if (!mainWindowViewModel.HideSuccessfulOperationDialog)
+                {
+                    MessageBox.Show(this, "Execution completed.", "Done!", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
             catch (Exception ex)
             {
@@ -169,21 +206,52 @@ namespace SymlinkCreator.ui.mainWindow
 
         private void AboutButton_OnClick(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show(
-                $"{ApplicationConfiguration.ApplicationName} v{ApplicationConfiguration.ApplicationVersion}\n" +
-                "Developed by Arnob Paul. Thank you for using this application! :)\n\n" +
-                $"Do you want to visit the developer's website?\n{ApplicationConfiguration.CompanyWebAddress}",
-                "About", MessageBoxButton.YesNo,
-                MessageBoxImage.Asterisk);
-
-            if (result == MessageBoxResult.Yes)
-                Process.Start(ApplicationConfiguration.CompanyWebAddress);
+            AboutWindow aboutWindow = new AboutWindow();
+            aboutWindow.ShowDialog();
         }
 
         #endregion
 
 
         #region helper methods
+
+        private string[] GetDroppedFileOrFolderList(DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.Text))
+            {
+                string droppedFileOrFolderList = (string)e.Data.GetData(DataFormats.Text);
+                return GetFileOrFolderListFromString(droppedFileOrFolderList);
+            }
+
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                try
+                {
+                    return (string[])e.Data.GetData(DataFormats.FileDrop);
+                }
+                catch (COMException) // Handle long-path scenarios
+                {
+                    return LongPathAware.GetPathsFromShellIdListArray(e.Data).ToArray();
+                }
+            }
+
+            return null;
+        }
+
+        private string[] GetFileOrFolderListFromString(string fileOrFolderListString)
+        {
+            return fileOrFolderListString
+                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(path => SanitizePath(path)) // Sanitize each individual path
+                .Where(path => !string.IsNullOrWhiteSpace(path)) // Ensure no empty strings
+                .ToArray();
+        }
+
+        private string SanitizePath(string path)
+        {
+            return path.Trim() // Trim any surrounding whitespace
+                       .Trim('"'); // Remove surrounding quotation marks if present
+        }
 
         private void AddToSourceFileOrFolderList(IEnumerable<string> fileOrFolderList)
         {
@@ -204,6 +272,15 @@ namespace SymlinkCreator.ui.mainWindow
 
             if (Directory.Exists(destinationPath))
                 mainWindowViewModel.DestinationPath = destinationPath;
+        }
+
+        private bool IsRunningAsAdmin()
+        {
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
         }
 
         #endregion

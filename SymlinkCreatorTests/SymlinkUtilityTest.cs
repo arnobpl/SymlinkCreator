@@ -14,7 +14,7 @@ namespace SymlinkCreatorTests
             PrivateObject obj = new PrivateObject(symlinkAgent);
 
             // Test single-backward target file path
-            var retVal = obj.Invoke("GetRelativePath", "D:\\Abc\\Def\\Ghi", "D:\\Abc\\Def\\Qrs\\Test.mp3");
+            object retVal = obj.Invoke("GetRelativePath", "D:\\Abc\\Def\\Ghi", "D:\\Abc\\Def\\Qrs\\Test.mp3");
             Assert.AreEqual("..\\Qrs\\Test.mp3", retVal);
 
             // Test multiple-backward target file path

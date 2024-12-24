@@ -26,6 +26,8 @@ namespace SymlinkCreator.ui.mainWindow
 
         public bool ShouldRetainScriptFile { get; set; } = false;
 
+        public bool HideSuccessfulOperationDialog { get; set; } = false;
+
         #endregion
 
 
