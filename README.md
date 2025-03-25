@@ -34,34 +34,38 @@ Symlink Creator creates *symlinks* which is an NTFS feature. Unlike the traditio
 ## Why Symlink Creator needs administrative rights
 It has been stated before that Symlink Creator uses the `mklink` command to create symlinks. The `mklink` command requires administrative privilege to create symlinks. You can find more information [here](https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/create-symbolic-links).
 
-## Donation
-If you enjoy using Symlink Creator and also want to buy me a cup of tea, you are most welcome. You can send me a gift here: [PayPal](https://paypal.me/arnobpl)
+## Support Symlink Creator
+Symlink Creator is a simple tool, but if it has saved you time or made things a bit easier, consider supporting the project. Every contribution helps keep it going and encourages future improvements.
 
-You can also send me crypto tokens to the following addresses:
+You can donate via [PayPal](https://paypal.me/arnobpl).
+
+You can also send crypto tokens to the following addresses:
 
 <table>
-  <thead>
-    <tr>
-      <th>Blockchain</th>
-      <th>QR Code and Address</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Ethereum</td>
-      <td>
-        <img src="SymlinkCreator/_ReadMe/QR-Ethereum.png" alt="Ethereum QR Code" width="200"><br>
-        <code>0x2536B9A9a6b49234db2006482f43d02BEE6FDd07</code>
-      </td>
-    </tr>
-    <tr>
-      <td>Bitcoin</td>
-      <td>
-        <img src="SymlinkCreator/_ReadMe/QR-Bitcoin.png" alt="Bitcoin QR Code" width="200"><br>
-        <code>bc1qwhwqal63y629ltnyhvr0txl5xngnhh9dv9u5yf</code>
-      </td>
-    </tr>
-  </tbody>
+  <thead>
+    <tr>
+      <th>Blockchain</th>
+      <th>QR Code and Address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Ethereum</td>
+      <td>
+        <img src="SymlinkCreator/_ReadMe/QR-Ethereum.png" alt="Ethereum QR Code" width="200"><br>
+        <code>0x2536B9A9a6b49234db2006482f43d02BEE6FDd07</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Bitcoin</td>
+      <td>
+        <img src="SymlinkCreator/_ReadMe/QR-Bitcoin.png" alt="Bitcoin QR Code" width="200"><br>
+        <code>bc1qwhwqal63y629ltnyhvr0txl5xngnhh9dv9u5yf</code>
+      </td>
+    </tr>
+  </tbody>
 </table>
 
-Thank you for using Symlink Creator and sharing feedback. Happy Symlinking!
+If donating is not an option, simply starring the repo, sharing feedback, or spreading the word is equally appreciated. Thank you for using Symlink Creator and sharing your thoughts.
+
+Happy Symlinking!
