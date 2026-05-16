@@ -331,3 +331,6 @@ ASALocalRun/
 
 # https://github.com/Fody/Costura
 */FodyWeavers.xsd
+
+# Local WinGet submission workspace
+winget-manifests/
