@@ -226,7 +226,6 @@
     <Compile Include="core\ApplicationConfiguration.cs" />
     <Compile Include="core\ScriptExecutor.cs" />
     <Compile Include="core\SymlinkAgent.cs" />
-    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ui\aboutWindow\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
