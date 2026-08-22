@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Res = SymlinkCreator.Properties.Resources;
 
 namespace SymlinkCreator.core
 {
@@ -41,7 +42,7 @@ namespace SymlinkCreator.core
             // Check for destination path
             if (!Directory.Exists(_destinationPath))
             {
-                throw new FileNotFoundException("Destination path does not exist", _destinationPath);
+                throw new FileNotFoundException(Res.DestinationPathDoesNotExistErrorMessage, _destinationPath);
             }
 
             // Remove the last '\' character from the path if exists
@@ -61,7 +62,7 @@ namespace SymlinkCreator.core
 
             if (scriptExecutor.ExitCode != 0)
             {
-                throw new ApplicationException("Symlink script exited with an error.\n" + scriptExecutor.StandardError);
+                throw new ApplicationException(Res.SymlinkScriptFailedErrorMessage + "\n" + scriptExecutor.StandardError);
             }
         }
 

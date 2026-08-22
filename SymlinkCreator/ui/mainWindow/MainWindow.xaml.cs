@@ -1,7 +1,8 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using SymlinkCreator.core;
 using SymlinkCreator.ui.aboutWindow;
 using SymlinkCreator.ui.utility;
+using Res = SymlinkCreator.Properties.Resources;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,15 +28,16 @@ namespace SymlinkCreator.ui.mainWindow
         public MainWindow()
         {
             InitializeComponent();
+            this.Title = string.Format(Res.WindowTitleFormat,
+                ApplicationConfiguration.ApplicationName,
+                ApplicationConfiguration.ApplicationVersion);
             this.Loaded += MainWindow_Loaded;
 
             if (IsRunningAsAdmin())
             {
                 MessageBox.Show(
-                    $"Running {this.Title} as an administrator may disable drag-n-drop functionality. " +
-                    "Only symlink creation requires administrative rights. " +
-                    "Please restart the application without administrative privileges to enable drag-n-drop functionality.",
-                    "Warning",
+                    string.Format(Res.AdminWarningMessageFormat, this.Title),
+                    Res.WarningDialogTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
@@ -172,13 +174,13 @@ namespace SymlinkCreator.ui.mainWindow
 
             if (mainWindowViewModel.FileOrFolderList.Count == 0)
             {
-                MessageBox.Show(this, "No files or folders to create symlinks for.", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(this, Res.NoSourceItemsErrorMessage, Res.ErrorDialogTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(mainWindowViewModel.DestinationPath))
             {
-                MessageBox.Show(this, "Destination path is empty.", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(this, Res.DestinationPathEmptyErrorMessage, Res.ErrorDialogTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -195,12 +197,12 @@ namespace SymlinkCreator.ui.mainWindow
                 symlinkAgent.CreateSymlinks();
                 if (!mainWindowViewModel.HideSuccessfulOperationDialog)
                 {
-                    MessageBox.Show(this, "Execution completed.", "Done!", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(this, Res.ExecutionCompletedMessage, Res.DoneDialogTitle, MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, ex.Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(this, ex.Message, Res.ErrorDialogTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SymlinkCreator.ui.aboutWindow"
         xmlns:core="clr-namespace:SymlinkCreator.core"
+        xmlns:res="clr-namespace:SymlinkCreator.Properties"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="About"
+        Title="{x:Static res:Resources.AboutWindowTitle}"
         Width="400"
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow"
@@ -37,10 +38,10 @@
             </TextBlock.Text>
         </TextBlock>
 
-        <TextBlock Text="Developed by Arnob Paul. Thank you for using this application! :)" />
+        <TextBlock Text="{x:Static res:Resources.AboutDeveloperMessage}" />
 
         <TextBlock>
-            <Run Text="Visit the developer's website:" />
+            <Run Text="{x:Static res:Resources.VisitDeveloperWebsiteText}" />
             <LineBreak />
             <Hyperlink NavigateUri="{x:Static core:ApplicationConfiguration.CompanyWebAddressUri}" Click="Hyperlink_OnClick">
                 <Run Text="{x:Static core:ApplicationConfiguration.CompanyWebAddress}" />
@@ -48,7 +49,7 @@
         </TextBlock>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="OK" IsDefault="True" Click="OkButton_OnClick" />
+            <Button Content="{x:Static res:Resources.OkButton}" IsDefault="True" Click="OkButton_OnClick" />
         </StackPanel>
     </StackPanel>
 </Window>

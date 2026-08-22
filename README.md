@@ -1,6 +1,8 @@
 # Symlink Creator
 Symlink Creator is a GUI app for creating symbolic links (symlinks), and it is based on the [`mklink`](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/mklink) command. You can create multiple symlinks at a time.
 
+> **简体中文（汉化版）**：本仓库包含完整的简体中文界面翻译（见 [README.zh-CN.md](README.zh-CN.md)），可直接从 [Releases](https://github.com/arnobpl/SymlinkCreator/releases) 获取英文原版；中文汉化版请使用本仓库源码自行构建。
+
 ## Get Symlink Creator
 
 [![Install with WinGet](https://img.shields.io/badge/Install-WinGet-blue?style=for-the-badge&logo=windows)](https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/ArnobPaul/SymlinkCreator)

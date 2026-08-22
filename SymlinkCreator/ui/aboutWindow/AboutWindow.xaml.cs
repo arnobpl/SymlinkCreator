@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Documents;
+using Res = SymlinkCreator.Properties.Resources;
 
 namespace SymlinkCreator.ui.aboutWindow
 {
@@ -30,7 +31,7 @@ namespace SymlinkCreator.ui.aboutWindow
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Failed to open link: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(string.Format(Res.FailedToOpenLinkMessageFormat, ex.Message), Res.ErrorDialogTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

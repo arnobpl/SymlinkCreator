@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="WindowTitleFormat" xml:space="preserve">
+    <value>{0} 符号链接创建器 v{1}</value>
+  </data>
+  <data name="SourceFileOrFolderListLabel" xml:space="preserve">
+    <value>源文件或文件夹列表：</value>
+  </data>
+  <data name="AddFilesButton" xml:space="preserve">
+    <value>添加文件</value>
+  </data>
+  <data name="AddFilesButtonToolTip" xml:space="preserve">
+    <value>将文件添加到列表</value>
+  </data>
+  <data name="AddFoldersButton" xml:space="preserve">
+    <value>添加文件夹</value>
+  </data>
+  <data name="AddFoldersButtonToolTip" xml:space="preserve">
+    <value>将文件夹添加到列表</value>
+  </data>
+  <data name="RemoveSelectedButton" xml:space="preserve">
+    <value>移除所选</value>
+  </data>
+  <data name="RemoveSelectedButtonToolTip" xml:space="preserve">
+    <value>从列表中移除所选项目</value>
+  </data>
+  <data name="ClearListButton" xml:space="preserve">
+    <value>清空列表</value>
+  </data>
+  <data name="ClearListButtonToolTip" xml:space="preserve">
+    <value>清空列表中的所有项目</value>
+  </data>
+  <data name="DestinationPathLabel" xml:space="preserve">
+    <value>目标路径：</value>
+  </data>
+  <data name="BrowseButton" xml:space="preserve">
+    <value>浏览</value>
+  </data>
+  <data name="UseRelativePathCheckBox" xml:space="preserve">
+    <value>尽可能使用相对路径</value>
+  </data>
+  <data name="UseRelativePathCheckBoxToolTip" xml:space="preserve">
+    <value>勾选此选项后，如果源和目标位于同一驱动器，将使用相对路径。</value>
+  </data>
+  <data name="RetainScriptFileCheckBox" xml:space="preserve">
+    <value>执行后保留脚本文件</value>
+  </data>
+  <data name="RetainScriptFileCheckBoxToolTip" xml:space="preserve">
+    <value>勾选此选项后，将在创建符号链接后把脚本保存到应用程序所在位置。</value>
+  </data>
+  <data name="HideSuccessfulOperationDialogCheckBox" xml:space="preserve">
+    <value>隐藏成功操作对话框</value>
+  </data>
+  <data name="HideSuccessfulOperationDialogCheckBoxToolTip" xml:space="preserve">
+    <value>勾选此选项后，仅在出错时显示对话框。</value>
+  </data>
+  <data name="CreateSymlinksButton" xml:space="preserve">
+    <value>创建符号链接</value>
+  </data>
+  <data name="AboutButton" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="AboutWindowTitle" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="AdminWarningMessageFormat" xml:space="preserve">
+    <value>以管理员身份运行 {0} 可能会禁用拖放功能。只有创建符号链接才需要管理员权限。请在不使用管理员权限的情况下重新启动应用程序，以启用拖放功能。</value>
+  </data>
+  <data name="WarningDialogTitle" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="ErrorDialogTitle" xml:space="preserve">
+    <value>错误！</value>
+  </data>
+  <data name="NoSourceItemsErrorMessage" xml:space="preserve">
+    <value>没有可用于创建符号链接的文件或文件夹。</value>
+  </data>
+  <data name="DestinationPathEmptyErrorMessage" xml:space="preserve">
+    <value>目标路径为空。</value>
+  </data>
+  <data name="ExecutionCompletedMessage" xml:space="preserve">
+    <value>执行完成。</value>
+  </data>
+  <data name="DoneDialogTitle" xml:space="preserve">
+    <value>完成！</value>
+  </data>
+  <data name="AboutDeveloperMessage" xml:space="preserve">
+    <value>由 Arnob Paul 开发。感谢您使用本应用！:)</value>
+  </data>
+  <data name="VisitDeveloperWebsiteText" xml:space="preserve">
+    <value>访问开发者网站：</value>
+  </data>
+  <data name="OkButton" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="FailedToOpenLinkMessageFormat" xml:space="preserve">
+    <value>无法打开链接：{0}</value>
+  </data>
+  <data name="DestinationPathDoesNotExistErrorMessage" xml:space="preserve">
+    <value>目标路径不存在</value>
+  </data>
+  <data name="SymlinkScriptFailedErrorMessage" xml:space="preserve">
+    <value>符号链接脚本执行出错。</value>
+  </data>
+</root>

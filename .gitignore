@@ -334,3 +334,6 @@ ASALocalRun/
 
 # Local WinGet submission workspace
 winget-manifests/
+
+# Local CLI-only build project (dotnet build SymlinkCreator.Sdk.csproj) - not part of the upstream PR
+SymlinkCreator.Sdk.csproj

@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="WindowTitleFormat" xml:space="preserve">
+    <value>{0} v{1}</value>
+  </data>
+  <data name="SourceFileOrFolderListLabel" xml:space="preserve">
+    <value>Source file or folder list:</value>
+  </data>
+  <data name="AddFilesButton" xml:space="preserve">
+    <value>Add files</value>
+  </data>
+  <data name="AddFilesButtonToolTip" xml:space="preserve">
+    <value>Add files to the list</value>
+  </data>
+  <data name="AddFoldersButton" xml:space="preserve">
+    <value>Add folders</value>
+  </data>
+  <data name="AddFoldersButtonToolTip" xml:space="preserve">
+    <value>Add folders to the list</value>
+  </data>
+  <data name="RemoveSelectedButton" xml:space="preserve">
+    <value>Remove selected</value>
+  </data>
+  <data name="RemoveSelectedButtonToolTip" xml:space="preserve">
+    <value>Remove selected items from the list</value>
+  </data>
+  <data name="ClearListButton" xml:space="preserve">
+    <value>Clear list</value>
+  </data>
+  <data name="ClearListButtonToolTip" xml:space="preserve">
+    <value>Clear all items from the list</value>
+  </data>
+  <data name="DestinationPathLabel" xml:space="preserve">
+    <value>Destination path:</value>
+  </data>
+  <data name="BrowseButton" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="UseRelativePathCheckBox" xml:space="preserve">
+    <value>Use relative path if possible</value>
+  </data>
+  <data name="UseRelativePathCheckBoxToolTip" xml:space="preserve">
+    <value>Check this to use a relative path if both source and destination are in the same drive.</value>
+  </data>
+  <data name="RetainScriptFileCheckBox" xml:space="preserve">
+    <value>Retain script file after execution</value>
+  </data>
+  <data name="RetainScriptFileCheckBoxToolTip" xml:space="preserve">
+    <value>Check this to save the script in the application's location after creating symlinks.</value>
+  </data>
+  <data name="HideSuccessfulOperationDialogCheckBox" xml:space="preserve">
+    <value>Hide successful operation dialog</value>
+  </data>
+  <data name="HideSuccessfulOperationDialogCheckBoxToolTip" xml:space="preserve">
+    <value>Check this to only show a dialog when an error occurs.</value>
+  </data>
+  <data name="CreateSymlinksButton" xml:space="preserve">
+    <value>Create symlinks</value>
+  </data>
+  <data name="AboutButton" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="AboutWindowTitle" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="AdminWarningMessageFormat" xml:space="preserve">
+    <value>Running {0} as an administrator may disable drag-n-drop functionality. Only symlink creation requires administrative rights. Please restart the application without administrative privileges to enable drag-n-drop functionality.</value>
+  </data>
+  <data name="WarningDialogTitle" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="ErrorDialogTitle" xml:space="preserve">
+    <value>Error!</value>
+  </data>
+  <data name="NoSourceItemsErrorMessage" xml:space="preserve">
+    <value>No files or folders to create symlinks for.</value>
+  </data>
+  <data name="DestinationPathEmptyErrorMessage" xml:space="preserve">
+    <value>Destination path is empty.</value>
+  </data>
+  <data name="ExecutionCompletedMessage" xml:space="preserve">
+    <value>Execution completed.</value>
+  </data>
+  <data name="DoneDialogTitle" xml:space="preserve">
+    <value>Done!</value>
+  </data>
+  <data name="AboutDeveloperMessage" xml:space="preserve">
+    <value>Developed by Arnob Paul. Thank you for using this application! :)</value>
+  </data>
+  <data name="VisitDeveloperWebsiteText" xml:space="preserve">
+    <value>Visit the developer's website:</value>
+  </data>
+  <data name="OkButton" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="FailedToOpenLinkMessageFormat" xml:space="preserve">
+    <value>Failed to open link: {0}</value>
+  </data>
+  <data name="DestinationPathDoesNotExistErrorMessage" xml:space="preserve">
+    <value>Destination path does not exist</value>
+  </data>
+  <data name="SymlinkScriptFailedErrorMessage" xml:space="preserve">
+    <value>Symlink script exited with an error.</value>
+  </data>
+</root>
