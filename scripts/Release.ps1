@@ -9,6 +9,7 @@ param(
     [string] $ReleaseNotesPath,
     [switch] $LaunchForManualTest,
     [switch] $SkipWinGetValidation,
+    [switch] $ReplaceExistingRelease,
     [switch] $Publish
 )
 
@@ -20,6 +21,9 @@ if ($LaunchForManualTest -and $Publish) {
 }
 if ($SkipWinGetValidation -and $Publish) {
     throw 'WinGet validation cannot be skipped when publishing a release.'
+}
+if ($ReplaceExistingRelease -and -not $Publish) {
+    throw 'Replacing an existing release requires -Publish.'
 }
 if (-not [string]::IsNullOrWhiteSpace($ReleaseNotesPath) -and -not $Publish) {
     throw 'Release notes can only be supplied with -Publish.'
@@ -55,58 +59,30 @@ if ([string]::IsNullOrWhiteSpace($projectVersion)) {
 
 $releaseVersion = $projectVersion
 $tag = "v$releaseVersion"
-$null = & git -C $repositoryRoot rev-parse --verify --quiet "refs/tags/$tag^{commit}"
-$tagLookupExitCode = $LASTEXITCODE
-$archiveRevision = 'HEAD'
-$archiveRevisionLabel = 'HEAD'
-if ($tagLookupExitCode -eq 0) {
-    $archiveRevision = $tag
-    $archiveRevisionLabel = $tag
+$headMetadata = @(& git -C $repositoryRoot show -s '--format=%H%n%ct' HEAD)
+if ($LASTEXITCODE -ne 0 -or $headMetadata.Count -ne 2) {
+    throw 'Unable to read the HEAD commit and timestamp used for release metadata.'
 }
-elseif ($tagLookupExitCode -ne 1) {
-    throw "Unable to check whether local release tag '$tag' exists."
+$headCommit = $headMetadata[0].Trim()
+if ($headCommit -notmatch '^[0-9a-fA-F]{40,64}$') {
+    throw "Git returned an invalid HEAD commit '$headCommit'."
 }
-
-if ($Publish -and $tagLookupExitCode -eq 1) {
-    $remoteTagLines = @(& git -C $repositoryRoot ls-remote --exit-code --tags origin "refs/tags/$tag" "refs/tags/$tag^{}")
-    $remoteTagExitCode = $LASTEXITCODE
-    if ($remoteTagExitCode -eq 0) {
-        $remoteTagLine = $remoteTagLines | Where-Object { $_ -match '\^\{\}$' } | Select-Object -First 1
-        if ([string]::IsNullOrWhiteSpace($remoteTagLine)) {
-            $remoteTagLine = $remoteTagLines[0]
-        }
-        $remoteTagCommit = @($remoteTagLine -split '\s+')[0]
-        if ($remoteTagCommit -notmatch '^[0-9a-fA-F]{40,64}$') {
-            throw "Remote release tag '$tag' resolved to an invalid Git object '$remoteTagCommit'."
-        }
-        $archiveRevision = $remoteTagCommit
-        $archiveRevisionLabel = $tag
-    }
-    elseif ($remoteTagExitCode -ne 2) {
-        throw "Unable to check whether remote release tag '$tag' exists."
-    }
-}
-
-$commitTimestampText = & git -C $repositoryRoot show -s --format=%ct $archiveRevision
-if ($LASTEXITCODE -ne 0) {
-    throw "Unable to read the $archiveRevisionLabel commit timestamp used for reproducible ZIP metadata."
-}
-$commitTimestampText = ([string] $commitTimestampText).Trim()
+$commitTimestampText = $headMetadata[1].Trim()
 $commitTimestampSeconds = [long] 0
 if (-not [long]::TryParse(
         $commitTimestampText,
         [System.Globalization.NumberStyles]::None,
         [System.Globalization.CultureInfo]::InvariantCulture,
         [ref] $commitTimestampSeconds)) {
-    throw "Git returned an invalid $archiveRevisionLabel commit timestamp '$commitTimestampText'."
+    throw "Git returned an invalid HEAD commit timestamp '$commitTimestampText'."
 }
 $archiveTimestamp = [System.DateTimeOffset]::FromUnixTimeSeconds($commitTimestampSeconds).ToUniversalTime()
 # ZIP stores seconds at two-second precision; normalize once so repeated builds have identical metadata.
-$archiveTimestamp = $archiveTimestamp.AddSeconds(-($archiveTimestamp.Second % 2))
+$archiveTimestamp = $archiveTimestamp.AddSeconds( - ($archiveTimestamp.Second % 2))
 $minimumZipTimestamp = [System.DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [System.TimeSpan]::Zero)
 $maximumZipTimestamp = [System.DateTimeOffset]::new(2107, 12, 31, 23, 59, 58, [System.TimeSpan]::Zero)
 if ($archiveTimestamp -lt $minimumZipTimestamp -or $archiveTimestamp -gt $maximumZipTimestamp) {
-    throw "The $archiveRevisionLabel commit timestamp '$archiveTimestamp' is outside the ZIP timestamp range."
+    throw "The HEAD commit timestamp '$archiveTimestamp' is outside the ZIP timestamp range."
 }
 
 if ($Publish -and -not [string]::IsNullOrWhiteSpace($env:GITHUB_REF_NAME) -and $env:GITHUB_REF_NAME -ne $tag) {
@@ -135,16 +111,16 @@ $finalManifestDirectory = Join-Path $outputDirectoryPath "winget\$releaseVersion
 $installerManifestName = 'ArnobPaul.SymlinkCreator.installer.yaml'
 $releaseTargets = @(
     [pscustomobject] @{
-        Platform = 'x64'
-        RuntimeIdentifier = 'win-x64'
+        Platform           = 'x64'
+        RuntimeIdentifier  = 'win-x64'
         WinGetArchitecture = 'x64'
-        AssetName = 'Symlink.Creator.x64.zip'
+        AssetName          = 'Symlink.Creator.x64.zip'
     },
     [pscustomobject] @{
-        Platform = 'ARM64'
-        RuntimeIdentifier = 'win-arm64'
+        Platform           = 'ARM64'
+        RuntimeIdentifier  = 'win-arm64'
         WinGetArchitecture = 'arm64'
-        AssetName = 'Symlink.Creator.arm64.zip'
+        AssetName          = 'Symlink.Creator.arm64.zip'
     }
 )
 $hostPlatform = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
@@ -234,10 +210,10 @@ function Write-WinGetManifestSet {
     New-Item -ItemType Directory -Path $Directory -Force | Out-Null
 
     $replacements = @{
-        '__VERSION__' = $releaseVersion
-        '__X64_INSTALLER_URL__' = $x64Package[0].InstallerUrl
-        '__X64_INSTALLER_SHA256__' = $x64Package[0].ZipSha256
-        '__ARM64_INSTALLER_URL__' = $arm64Package[0].InstallerUrl
+        '__VERSION__'                = $releaseVersion
+        '__X64_INSTALLER_URL__'      = $x64Package[0].InstallerUrl
+        '__X64_INSTALLER_SHA256__'   = $x64Package[0].ZipSha256
+        '__ARM64_INSTALLER_URL__'    = $arm64Package[0].InstallerUrl
         '__ARM64_INSTALLER_SHA256__' = $arm64Package[0].ZipSha256
     }
     $manifests = @(
@@ -306,8 +282,8 @@ function Invoke-ArchitecturePackaging {
     }
     $archiveNames = @(
         $publishEntries |
-            ForEach-Object { [System.IO.Path]::GetRelativePath($publishDirectory, $_.FullName).Replace('\', '/') } |
-            Sort-Object
+        ForEach-Object { [System.IO.Path]::GetRelativePath($publishDirectory, $_.FullName).Replace('\', '/') } |
+        Sort-Object
     )
     foreach ($requiredName in @('SymlinkCreator.exe', 'resources.pri')) {
         $requiredPath = Join-Path $publishDirectory $requiredName
@@ -352,14 +328,14 @@ function Invoke-ArchitecturePackaging {
         -InformationAction Continue
 
     return [pscustomobject] @{
-        Platform = $Target.Platform
+        Platform           = $Target.Platform
         WinGetArchitecture = $Target.WinGetArchitecture
-        AssetName = $Target.AssetName
-        ZipPath = $zipPath
-        ZipLength = (Get-Item -LiteralPath $zipPath).Length
-        ZipSha256 = $zipHash
-        ArchiveNames = $archiveNames
-        InstallerUrl = "https://github.com/$Repository/releases/download/$tag/$($Target.AssetName)"
+        AssetName          = $Target.AssetName
+        ZipPath            = $zipPath
+        ZipLength          = (Get-Item -LiteralPath $zipPath).Length
+        ZipSha256          = $zipHash
+        ArchiveNames       = $archiveNames
+        InstallerUrl       = "https://github.com/$Repository/releases/download/$tag/$($Target.AssetName)"
     }
 }
 
@@ -368,7 +344,7 @@ function Invoke-ReleasePackaging {
     New-Item -ItemType Directory -Path $stagingDirectory -Force | Out-Null
 
     Write-Information "Packaging Symlink Creator $releaseVersion for x64 and ARM64..." -InformationAction Continue
-    Write-Information "Using Git $archiveRevisionLabel timestamp $($archiveTimestamp.ToString('u')) for reproducible ZIP entries." -InformationAction Continue
+    Write-Information "Using Git HEAD timestamp $($archiveTimestamp.ToString('u')) for reproducible ZIP entries." -InformationAction Continue
     $validationPlatform = if ($null -eq $hostPlatform) { 'x64' } else { $hostPlatform }
     Write-Information "Validating source and running tests for the host-compatible $validationPlatform target..." -InformationAction Continue
     & $buildScriptPath -TargetPlatform $validationPlatform -Configuration Release -Verify | Out-Host
@@ -378,8 +354,8 @@ function Invoke-ReleasePackaging {
     Write-Information "Generated WinGet manifests: $manifestDirectory" -InformationAction Continue
 
     return [pscustomobject] @{
-        Packages = $packages
-        ManifestDirectory = $manifestDirectory
+        Packages              = $packages
+        ManifestDirectory     = $manifestDirectory
         InstallerManifestPath = Join-Path $manifestDirectory $installerManifestName
     }
 }
@@ -399,8 +375,8 @@ function Test-ArchivePackage {
         $entries = @(Get-ChildItem -LiteralPath $extractRoot -File -Recurse -Force)
         $actualNames = @(
             $entries |
-                ForEach-Object { [System.IO.Path]::GetRelativePath($extractRoot, $_.FullName).Replace('\', '/') } |
-                Sort-Object
+            ForEach-Object { [System.IO.Path]::GetRelativePath($extractRoot, $_.FullName).Replace('\', '/') } |
+            Sort-Object
         )
         $expectedNames = @($Package.ArchiveNames | Sort-Object)
         if (($actualNames -join "`n") -ne ($expectedNames -join "`n")) {
@@ -512,6 +488,39 @@ function Get-GitHubRelease {
     throw "Unable to inspect GitHub release '$ReleaseTag': $responseText"
 }
 
+function Get-GitHubTagCommit {
+    $response = @(& gh api "repos/$Repository/commits/$tag" --jq '.sha' 2>&1)
+    $responseText = ($response | ForEach-Object ToString) -join "`n"
+    if ($LASTEXITCODE -eq 0) {
+        $commit = $responseText.Trim()
+        if ($commit -notmatch '^[0-9a-fA-F]{40,64}$') {
+            throw "GitHub release tag '$tag' resolved to an invalid commit '$commit'."
+        }
+        return $commit
+    }
+    if ($responseText -match '(?i)HTTP 404|"status"\s*:\s*"?404"?') {
+        return $null
+    }
+    throw "Unable to resolve GitHub release tag '$tag': $responseText"
+}
+
+function Invoke-GitHubReleaseTagReplacement {
+    param([Parameter(Mandatory)] [string] $Commit)
+
+    Invoke-CheckedCommand -FilePath 'gh' -ArgumentList @(
+        'api',
+        '--method', 'PATCH',
+        "repos/$Repository/git/refs/tags/$tag",
+        '-f', "sha=$Commit",
+        '-F', 'force=true'
+    )
+    Invoke-CheckedCommand -FilePath 'git' -ArgumentList @(
+        '-C', $repositoryRoot,
+        'tag', '--force', $tag, $Commit
+    )
+    Write-Information "GitHub release tag $tag now points to $Commit." -InformationAction Continue
+}
+
 function Assert-GitHubReleaseAsset {
     param(
         [Parameter(Mandatory)] [object] $GitHubRelease,
@@ -552,7 +561,7 @@ function Assert-GitHubReleaseAsset {
 }
 
 function Assert-CleanReleaseSource {
-    $status = @(git status --porcelain --untracked-files=all)
+    $status = @(git -C $repositoryRoot status --porcelain --untracked-files=all)
     if ($LASTEXITCODE -ne 0) {
         throw 'Unable to inspect Git status before publication.'
     }
@@ -568,16 +577,18 @@ function Publish-Release {
         [string] $NotesPath
     )
 
-    Assert-CleanReleaseSource
-    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
-        throw 'GitHub CLI (gh) is required to create the GitHub release.'
+    $githubRelease = Get-GitHubRelease -ReleaseTag $tag
+    $tagCommit = Get-GitHubTagCommit
+    if ($null -ne $tagCommit -and $tagCommit -ne $headCommit) {
+        if (-not $ReplaceExistingRelease) {
+            throw "GitHub release tag '$tag' points to $tagCommit instead of HEAD $headCommit. Use -ReplaceExistingRelease to move the tag and replace its assets."
+        }
+        Invoke-GitHubReleaseTagReplacement -Commit $headCommit
     }
-    $headCommit = (git rev-parse HEAD).Trim()
-    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($headCommit)) {
-        throw 'Unable to resolve the current Git commit for the GitHub release tag.'
+    elseif ($null -ne $githubRelease -and $null -eq $tagCommit) {
+        throw "GitHub release '$tag' exists without a resolvable Git tag."
     }
 
-    $githubRelease = Get-GitHubRelease -ReleaseTag $tag
     if ($null -eq $githubRelease) {
         Write-Information "Creating GitHub release $tag..." -InformationAction Continue
         $createArguments = @('release', 'create', $tag)
@@ -594,26 +605,32 @@ function Publish-Release {
             $createArguments += @('--notes-file', $NotesPath)
         }
         Invoke-CheckedCommand -FilePath 'gh' -ArgumentList $createArguments
-        $githubRelease = Get-GitHubRelease -ReleaseTag $tag
-        if ($null -eq $githubRelease) {
-            throw "GitHub release '$tag' could not be found after creation."
-        }
     }
     else {
-        Write-Information "GitHub release $tag already exists; verifying it so publication can resume safely." -InformationAction Continue
-        foreach ($package in $Release.Packages) {
-            if (@($githubRelease.assets | Where-Object name -eq $package.AssetName).Count -eq 0) {
-                Write-Information "Uploading missing asset $($package.AssetName)..." -InformationAction Continue
-                Invoke-CheckedCommand -FilePath 'gh' -ArgumentList @(
-                    'release', 'upload', $tag, $package.ZipPath,
-                    '--repo', $Repository
-                )
-                $githubRelease = Get-GitHubRelease -ReleaseTag $tag
-                if ($null -eq $githubRelease) {
-                    throw "GitHub release '$tag' could not be found after uploading $($package.AssetName)."
-                }
-            }
+        if ($ReplaceExistingRelease) {
+            Write-Information "Replacing GitHub release $tag with the validated build from $headCommit..." -InformationAction Continue
+            $packagesToUpload = @($Release.Packages)
         }
+        else {
+            Write-Information "GitHub release $tag already exists; verifying it so publication can resume safely." -InformationAction Continue
+            $packagesToUpload = @($Release.Packages | Where-Object {
+                    $assetName = $_.AssetName
+                    @($githubRelease.assets | Where-Object name -eq $assetName).Count -eq 0
+                })
+        }
+
+        foreach ($package in $packagesToUpload) {
+            Write-Information "Uploading $($package.AssetName)..." -InformationAction Continue
+            $uploadArguments = @(
+                'release', 'upload', $tag, $package.ZipPath,
+                '--repo', $Repository
+            )
+            if ($ReplaceExistingRelease) {
+                $uploadArguments += '--clobber'
+            }
+            Invoke-CheckedCommand -FilePath 'gh' -ArgumentList $uploadArguments
+        }
+
         if (-not [string]::IsNullOrWhiteSpace($NotesPath)) {
             Invoke-CheckedCommand -FilePath 'gh' -ArgumentList @(
                 'release', 'edit', $tag,
@@ -624,6 +641,14 @@ function Publish-Release {
         }
     }
 
+    $githubRelease = Get-GitHubRelease -ReleaseTag $tag
+    if ($null -eq $githubRelease) {
+        throw "GitHub release '$tag' could not be found after publication."
+    }
+    $publishedTagCommit = Get-GitHubTagCommit
+    if ($publishedTagCommit -ne $headCommit) {
+        throw "Published tag '$tag' points to '$publishedTagCommit' instead of HEAD '$headCommit'."
+    }
     foreach ($package in $Release.Packages) {
         Assert-GitHubReleaseAsset -GitHubRelease $githubRelease -Package $package
     }
