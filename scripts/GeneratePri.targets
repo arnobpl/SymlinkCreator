@@ -1,0 +1,77 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MakePriExe Condition="'$(MakePriExe)' == ''">$(NuGetPackageRoot)microsoft.windows.sdk.buildtools\$(PinnedWindowsSdkBuildToolsVersion)\bin\10.0.26100.0\x64\makepri.exe</MakePriExe>
+    <PriConfigFile>$(MSBuildProjectDirectory)\priconfig.xml</PriConfigFile>
+    <PriIntermediateDirectory>$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)$(Platform)\$(Configuration)\external-resources\</PriIntermediateDirectory>
+    <PriIntermediateFile>$(PriIntermediateDirectory)resources.pri</PriIntermediateFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <MrtResourceFiles Include="$(MSBuildProjectDirectory)\Strings\**\*.resw" />
+    <None Include="$(PriConfigFile)" />
+  </ItemGroup>
+
+  <Target
+    Name="GenerateExternalPri"
+    Inputs="@(MrtResourceFiles);$(PriConfigFile)"
+    Outputs="$(PriIntermediateFile)">
+    <Error
+      Condition="!Exists('$(MakePriExe)')"
+      Text="MakePri.exe was not found in the pinned Microsoft.Windows.SDK.BuildTools package at '$(MakePriExe)'. Restore the project before building localization resources." />
+    <Error
+      Condition="!Exists('$(PriConfigFile)')"
+      Text="The MRT Core configuration file was not found at '$(PriConfigFile)'." />
+    <MakeDir Directories="$(PriIntermediateDirectory)" />
+    <Exec
+      Command="&quot;$(MakePriExe)&quot; new /pr &quot;$(MSBuildProjectDirectory)\Strings&quot; /cf &quot;$(PriConfigFile)&quot; /of &quot;$(PriIntermediateFile)&quot; /o"
+      StandardOutputImportance="Low" />
+    <Error
+      Condition="!Exists('$(PriIntermediateFile)')"
+      Text="MakePri completed without creating the intermediate resources.pri at '$(PriIntermediateFile)'." />
+  </Target>
+
+  <Target
+    Name="CopyExternalPriForBuild"
+    AfterTargets="Build"
+    DependsOnTargets="GenerateExternalPri">
+    <Copy SourceFiles="$(PriIntermediateFile)" DestinationFiles="$(TargetDir)resources.pri" SkipUnchangedFiles="true" />
+    <Error
+      Condition="!Exists('$(TargetDir)resources.pri')"
+      Text="The generated resources.pri was not copied to '$(TargetDir)resources.pri'." />
+  </Target>
+
+  <Target
+    Name="PrepareWinUIResourcesForPublish"
+    BeforeTargets="ComputeResolvedFilesToPublishList"
+    DependsOnTargets="GenerateExternalPri">
+    <PropertyGroup>
+      <ApplicationPriFile>$(TargetDir)$(AssemblyName).pri</ApplicationPriFile>
+    </PropertyGroup>
+    <Error
+      Condition="!Exists('$(ApplicationPriFile)')"
+      Text="The compiled application PRI was not found at '$(ApplicationPriFile)'. Publish cannot include the WinUI XAML resources." />
+    <ItemGroup>
+      <!-- Keep localization beside the EXE; bundle the WinUI runtime resources below. -->
+      <ResolvedFileToPublish Include="$(PriIntermediateFile)">
+        <RelativePath>resources.pri</RelativePath>
+        <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </ResolvedFileToPublish>
+      <ResolvedFileToPublish Include="$(ApplicationPriFile)">
+        <RelativePath>$(AssemblyName).pri</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+      <CompiledXamlFiles Include="$(TargetDir)*.xbf" />
+      <ResolvedFileToPublish Include="@(CompiledXamlFiles)">
+        <RelativePath>%(CompiledXamlFiles.Filename)%(CompiledXamlFiles.Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+    <Error
+      Condition="@(CompiledXamlFiles) == ''"
+      Text="No compiled XAML resources were found in '$(TargetDir)'. Publish cannot include the WinUI XAML resources." />
+    <Error
+      Condition="!Exists('$(TargetDir)App.xbf') or !Exists('$(TargetDir)MainWindow.xbf')"
+      Text="The compiled XAML resources were not generated in '$(TargetDir)'." />
+  </Target>
+</Project>

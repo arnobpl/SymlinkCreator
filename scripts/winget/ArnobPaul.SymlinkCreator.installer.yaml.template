@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.28.0.schema.json
+
+PackageIdentifier: ArnobPaul.SymlinkCreator
+PackageVersion: __VERSION__
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+- RelativeFilePath: SymlinkCreator.exe
+  PortableCommandAlias: symlinkcreator
+Commands:
+- symlinkcreator
+Installers:
+- Architecture: x64
+  MinimumOSVersion: 10.0.18362.0
+  InstallerUrl: __X64_INSTALLER_URL__
+  InstallerSha256: __X64_INSTALLER_SHA256__
+  Dependencies:
+    PackageDependencies:
+    - PackageIdentifier: Microsoft.DotNet.Runtime.10
+      MinimumVersion: 10.0.0
+    - PackageIdentifier: Microsoft.WindowsAppRuntime.2
+    - PackageIdentifier: Microsoft.VCRedist.2015+.x64
+- Architecture: arm64
+  MinimumOSVersion: 10.0.18362.0
+  InstallerUrl: __ARM64_INSTALLER_URL__
+  InstallerSha256: __ARM64_INSTALLER_SHA256__
+  Dependencies:
+    PackageDependencies:
+    - PackageIdentifier: Microsoft.DotNet.Runtime.10
+      MinimumVersion: 10.0.0
+    - PackageIdentifier: Microsoft.WindowsAppRuntime.2
+    - PackageIdentifier: Microsoft.VCRedist.2015+.arm64
+ManifestType: installer
+ManifestVersion: 1.28.0

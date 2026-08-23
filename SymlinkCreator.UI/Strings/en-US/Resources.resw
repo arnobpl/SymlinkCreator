@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ApplicationName" xml:space="preserve"><value>Symlink Creator</value></data>
+  <data name="SourceListHeader.Text" xml:space="preserve"><value>Source file or folder list:</value></data>
+  <data name="SourceListView.ToolTip" xml:space="preserve"><value>Add files or folders, or drag and drop them here.</value></data>
+  <data name="AddFilesButton.Content" xml:space="preserve"><value>Add files</value></data>
+  <data name="AddFilesButton.ToolTip" xml:space="preserve"><value>Select one or more files to add as symlink sources.</value></data>
+  <data name="AddFoldersButton.Content" xml:space="preserve"><value>Add folders</value></data>
+  <data name="AddFoldersButton.ToolTip" xml:space="preserve"><value>Select one or more folders to add as symlink sources.</value></data>
+  <data name="RemoveSelectedButton.Content" xml:space="preserve"><value>Remove selected</value></data>
+  <data name="RemoveSelectedButton.ToolTip" xml:space="preserve"><value>Remove the selected sources from the list.</value></data>
+  <data name="ClearListButton.Content" xml:space="preserve"><value>Clear list</value></data>
+  <data name="ClearListButton.ToolTip" xml:space="preserve"><value>Remove all sources from the list.</value></data>
+  <data name="DestinationPathHeader.Text" xml:space="preserve"><value>Destination path:</value></data>
+  <data name="DestinationPathTextBox.ToolTip" xml:space="preserve"><value>Enter or drop the folder where the symlinks will be created.</value></data>
+  <data name="BrowseButton.Content" xml:space="preserve"><value>Browse</value></data>
+  <data name="BrowseButton.ToolTip" xml:space="preserve"><value>Choose the destination folder.</value></data>
+  <data name="RelativePathCheckBox.Content" xml:space="preserve"><value>Use relative path if possible</value></data>
+  <data name="RelativePathCheckBox.ToolTip" xml:space="preserve"><value>Use relative paths for symlink targets when the source and destination are on the same drive. Otherwise, use the full source path.</value></data>
+  <data name="RetainScriptCheckBox.Content" xml:space="preserve"><value>Retain script file on Desktop after execution</value></data>
+  <data name="RetainScriptCheckBox.ToolTip" xml:space="preserve"><value>Keep the generated .cmd script on your Desktop after symlink creation. It records the commands used to create the symlinks and can help with troubleshooting.</value></data>
+  <data name="HideSuccessCheckBox.Content" xml:space="preserve"><value>Hide successful operation dialog</value></data>
+  <data name="HideSuccessCheckBox.ToolTip" xml:space="preserve"><value>Do not show a confirmation dialog after successful symlink creation. Errors and canceled operations are still shown.</value></data>
+  <data name="CreateSymlinksButtonLabel.Text" xml:space="preserve"><value>Create symlinks</value></data>
+  <data name="CreateSymlinksButton.ToolTip" xml:space="preserve"><value>Create symlinks for every listed source. Windows may ask for administrator permission.</value></data>
+  <data name="CreateSymlinksButton.AccessibleName" xml:space="preserve"><value>Create symlinks</value></data>
+    <data name="CreateSymlinksButton.HelpText" xml:space="preserve"><value>Windows may ask for administrator permission.</value></data>
+    <data name="ElevationWarning.Message" xml:space="preserve"><value>Running {0} as an administrator may prevent drag-and-drop from working. Only symlink creation requires administrative rights. Restart the application without administrative privileges to enable drag-and-drop.</value></data>
+    <data name="ElevationWarning.Title" xml:space="preserve"><value>Warning</value></data>
+    <data name="AboutButton.Content" xml:space="preserve"><value>About</value></data>
+  <data name="AboutButton.ToolTip" xml:space="preserve"><value>View the application version and project website.</value></data>
+  <data name="NoSourcesError" xml:space="preserve"><value>No files or folders were selected.</value></data>
+  <data name="DestinationEmptyError" xml:space="preserve"><value>Destination path is empty.</value></data>
+  <data name="DestinationNotFoundFormat" xml:space="preserve"><value>Destination path does not exist: {0}</value></data>
+  <data name="DestinationInvalidCharactersError" xml:space="preserve"><value>Destination path contains invalid characters.</value></data>
+  <data name="DestinationInvalidFormat" xml:space="preserve"><value>Destination path is invalid: {0}</value></data>
+  <data name="SourceEmptyError" xml:space="preserve"><value>Source path is empty.</value></data>
+  <data name="SourceNotFoundFormat" xml:space="preserve"><value>Source path does not exist: {0}</value></data>
+  <data name="SourceInvalidCharactersError" xml:space="preserve"><value>Source path contains invalid characters.</value></data>
+  <data name="SourceInvalidFormat" xml:space="preserve"><value>Source path is invalid: {0}</value></data>
+  <data name="DuplicateLinkNameFormat" xml:space="preserve"><value>Multiple source paths would create the duplicate link name '{0}'.</value></data>
+  <data name="DestinationEntryExistsFormat" xml:space="preserve"><value>The destination already contains '{0}'.</value></data>
+  <data name="InvalidLinkNameFormat" xml:space="preserve"><value>The source path cannot be used as a link name: {0}</value></data>
+  <data name="EmptyPlanError" xml:space="preserve"><value>The symlink plan contains no entries.</value></data>
+  <data name="GeneratedPathInvalidCharactersError" xml:space="preserve"><value>A generated script path contains invalid characters.</value></data>
+  <data name="DestinationDropError" xml:space="preserve"><value>Drop one existing folder to use as the destination.</value></data>
+  <data name="DroppedInputErrorFormat" xml:space="preserve"><value>The dropped item could not be read. {0}</value></data>
+  <data name="PickerErrorFormat" xml:space="preserve"><value>The file or folder picker could not be opened. {0}</value></data>
+  <data name="ExecutionCompleted" xml:space="preserve"><value>Execution completed.</value></data>
+  <data name="ExecutionFailed" xml:space="preserve"><value>Symlink creation failed.</value></data>
+  <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>Symlink creation could not be started. {0}</value></data>
+  <data name="ElevationCanceled" xml:space="preserve"><value>The elevation request was canceled.</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>About Symlink Creator</value></data>
+  <data name="AboutDeveloperFormat" xml:space="preserve"><value>Developed by {0}</value></data>
+  <data name="AboutWebsiteLabel" xml:space="preserve"><value>Project website</value></data>
+  <data name="AppTitleBar.TitleFormat" xml:space="preserve"><value>{0} v{1}</value></data>
+  <data name="ErrorDialog.Title" xml:space="preserve"><value>Error</value></data>
+  <data name="SuccessDialog.Title" xml:space="preserve"><value>Done</value></data>
+  <data name="DialogOk.Content" xml:space="preserve"><value>OK</value></data>
+</root>

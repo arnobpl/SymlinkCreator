@@ -1,0 +1,23 @@
+* text=auto
+
+*.cs text eol=lf
+*.csproj text eol=lf
+*.props text eol=lf
+*.targets text eol=lf
+*.xaml text eol=lf
+*.resw text eol=lf
+*.xml text eol=lf
+*.sln text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.ps1 text eol=lf
+*.sh text eol=lf
+*.txt text eol=lf
+*.manifest text eol=lf
+.githooks/* text eol=lf
+
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary

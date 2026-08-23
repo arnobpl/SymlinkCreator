@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ApplicationName" xml:space="preserve"><value>Symlink Creator</value></data>
+  <data name="SourceListHeader.Text" xml:space="preserve"><value>Liste des fichiers ou dossiers source :</value></data>
+  <data name="SourceListView.ToolTip" xml:space="preserve"><value>Ajoutez des fichiers ou des dossiers, ou faites-les glisser ici.</value></data>
+  <data name="AddFilesButton.Content" xml:space="preserve"><value>Ajouter des fichiers</value></data>
+  <data name="AddFilesButton.ToolTip" xml:space="preserve"><value>Sélectionnez un ou plusieurs fichiers à utiliser comme sources de liens symboliques.</value></data>
+  <data name="AddFoldersButton.Content" xml:space="preserve"><value>Ajouter des dossiers</value></data>
+  <data name="AddFoldersButton.ToolTip" xml:space="preserve"><value>Sélectionnez un ou plusieurs dossiers à utiliser comme sources de liens symboliques.</value></data>
+  <data name="RemoveSelectedButton.Content" xml:space="preserve"><value>Supprimer la sélection</value></data>
+  <data name="RemoveSelectedButton.ToolTip" xml:space="preserve"><value>Supprimez les sources sélectionnées de la liste.</value></data>
+  <data name="ClearListButton.Content" xml:space="preserve"><value>Effacer la liste</value></data>
+  <data name="ClearListButton.ToolTip" xml:space="preserve"><value>Supprimez toutes les sources de la liste.</value></data>
+  <data name="DestinationPathHeader.Text" xml:space="preserve"><value>Chemin de destination :</value></data>
+  <data name="DestinationPathTextBox.ToolTip" xml:space="preserve"><value>Entrez ou faites glisser le dossier dans lequel les liens symboliques seront créés.</value></data>
+  <data name="BrowseButton.Content" xml:space="preserve"><value>Parcourir</value></data>
+  <data name="BrowseButton.ToolTip" xml:space="preserve"><value>Choisissez le dossier de destination.</value></data>
+  <data name="RelativePathCheckBox.Content" xml:space="preserve"><value>Utiliser un chemin relatif si possible</value></data>
+  <data name="RelativePathCheckBox.ToolTip" xml:space="preserve"><value>Utilisez des chemins relatifs pour les cibles des liens symboliques lorsque la source et la destination se trouvent sur le même lecteur. Sinon, utilisez le chemin complet de la source.</value></data>
+  <data name="RetainScriptCheckBox.Content" xml:space="preserve"><value>Conserver le fichier de script sur le Bureau après l’exécution</value></data>
+  <data name="RetainScriptCheckBox.ToolTip" xml:space="preserve"><value>Conservez le script .cmd généré sur le Bureau après la création des liens symboliques. Il consigne les commandes utilisées et peut aider au dépannage.</value></data>
+  <data name="HideSuccessCheckBox.Content" xml:space="preserve"><value>Masquer la boîte de dialogue de confirmation</value></data>
+  <data name="HideSuccessCheckBox.ToolTip" xml:space="preserve"><value>N’affichez pas de boîte de dialogue de confirmation après la création réussie des liens symboliques. Les erreurs et les opérations annulées restent affichées.</value></data>
+  <data name="CreateSymlinksButtonLabel.Text" xml:space="preserve"><value>Créer des liens symboliques</value></data>
+  <data name="CreateSymlinksButton.ToolTip" xml:space="preserve"><value>Créez des liens symboliques pour chaque source de la liste. Windows peut demander des droits d’administrateur.</value></data>
+  <data name="CreateSymlinksButton.AccessibleName" xml:space="preserve"><value>Créer des liens symboliques</value></data>
+  <data name="CreateSymlinksButton.HelpText" xml:space="preserve"><value>Windows peut demander des droits d’administrateur.</value></data>
+  <data name="ElevationWarning.Message" xml:space="preserve"><value>L’exécution de {0} en tant qu’administrateur peut empêcher le glisser-déposer de fonctionner. Seule la création de liens symboliques nécessite des droits d’administrateur. Redémarrez l’application sans privilèges d’administrateur pour activer le glisser-déposer.</value></data>
+  <data name="ElevationWarning.Title" xml:space="preserve"><value>Avertissement</value></data>
+  <data name="AboutButton.Content" xml:space="preserve"><value>À propos</value></data>
+  <data name="AboutButton.ToolTip" xml:space="preserve"><value>Affichez la version de l’application et le site web du projet.</value></data>
+  <data name="NoSourcesError" xml:space="preserve"><value>Aucun fichier ou dossier n’a été sélectionné.</value></data>
+  <data name="DestinationEmptyError" xml:space="preserve"><value>Le chemin de destination est vide.</value></data>
+  <data name="DestinationNotFoundFormat" xml:space="preserve"><value>Le chemin de destination n’existe pas : {0}</value></data>
+  <data name="DestinationInvalidCharactersError" xml:space="preserve"><value>Le chemin de destination contient des caractères non valides.</value></data>
+  <data name="DestinationInvalidFormat" xml:space="preserve"><value>Le chemin de destination n’est pas valide : {0}</value></data>
+  <data name="SourceEmptyError" xml:space="preserve"><value>Le chemin source est vide.</value></data>
+  <data name="SourceNotFoundFormat" xml:space="preserve"><value>Le chemin source n’existe pas : {0}</value></data>
+  <data name="SourceInvalidCharactersError" xml:space="preserve"><value>Le chemin source contient des caractères non valides.</value></data>
+  <data name="SourceInvalidFormat" xml:space="preserve"><value>Le chemin source n’est pas valide : {0}</value></data>
+  <data name="DuplicateLinkNameFormat" xml:space="preserve"><value>Plusieurs chemins source créeraient le nom de lien en double « {0} ».</value></data>
+  <data name="DestinationEntryExistsFormat" xml:space="preserve"><value>La destination contient déjà « {0} ».</value></data>
+  <data name="InvalidLinkNameFormat" xml:space="preserve"><value>Le chemin source ne peut pas être utilisé comme nom de lien : {0}</value></data>
+  <data name="EmptyPlanError" xml:space="preserve"><value>Le plan de liens symboliques ne contient aucune entrée.</value></data>
+  <data name="GeneratedPathInvalidCharactersError" xml:space="preserve"><value>Un chemin de script généré contient des caractères non valides.</value></data>
+  <data name="DestinationDropError" xml:space="preserve"><value>Faites glisser un dossier existant pour l’utiliser comme destination.</value></data>
+  <data name="DroppedInputErrorFormat" xml:space="preserve"><value>L’élément déposé n’a pas pu être lu. {0}</value></data>
+  <data name="PickerErrorFormat" xml:space="preserve"><value>Le sélecteur de fichiers ou de dossiers n’a pas pu être ouvert. {0}</value></data>
+  <data name="ExecutionCompleted" xml:space="preserve"><value>Exécution terminée.</value></data>
+  <data name="ExecutionFailed" xml:space="preserve"><value>La création des liens symboliques a échoué.</value></data>
+  <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>La création des liens symboliques n’a pas pu démarrer. {0}</value></data>
+  <data name="ElevationCanceled" xml:space="preserve"><value>La demande de droits d’administrateur a été annulée.</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>À propos de Symlink Creator</value></data>
+  <data name="AboutDeveloperFormat" xml:space="preserve"><value>Développé par {0}</value></data>
+  <data name="AboutWebsiteLabel" xml:space="preserve"><value>Site web du projet</value></data>
+  <data name="AppTitleBar.TitleFormat" xml:space="preserve"><value>{0} v{1}</value></data>
+  <data name="ErrorDialog.Title" xml:space="preserve"><value>Erreur</value></data>
+  <data name="SuccessDialog.Title" xml:space="preserve"><value>Terminé</value></data>
+  <data name="DialogOk.Content" xml:space="preserve"><value>OK</value></data>
+</root>

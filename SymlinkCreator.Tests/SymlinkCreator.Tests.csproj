@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(WindowsTargetFramework)</TargetFramework>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <Platforms>x64;ARM64</Platforms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <MSTestAnalysisMode>Recommended</MSTestAnalysisMode>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="4.3.3" />
+    <PackageReference Include="MSTest.TestFramework" Version="4.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SymlinkCreator.Core\SymlinkCreator.Core.csproj" />
+    <ProjectReference Include="..\SymlinkCreator.UI\SymlinkCreator.UI.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Test the non-XAML UI logic without loading the WinExe bootstrap module in testhost. -->
+    <Compile Include="..\SymlinkCreator.UI\MainWindowViewModel.cs" Link="UI\MainWindowViewModel.cs" />
+    <Compile Include="..\SymlinkCreator.UI\StartupOptions.cs" Link="UI\StartupOptions.cs" />
+    <Compile Include="..\SymlinkCreator.UI\WindowsPath.cs" Link="UI\WindowsPath.cs" />
+    <Content Include="..\SymlinkCreator.UI\Strings\**\Resources.resw" LinkBase="Strings" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <Target Name="CopyWinUiPriToTestOutput" AfterTargets="Build">
+    <PropertyGroup>
+      <WinUiRuntimeIdentifier Condition="'$(Platform)' == 'x64'">win-x64</WinUiRuntimeIdentifier>
+      <WinUiRuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</WinUiRuntimeIdentifier>
+      <WinUiOutputDirectory>$(MSBuildProjectDirectory)\..\SymlinkCreator.UI\bin\$(Platform)\$(Configuration)\$(WindowsTargetFramework)\$(WinUiRuntimeIdentifier)</WinUiOutputDirectory>
+    </PropertyGroup>
+    <Error
+      Condition="'$(WinUiRuntimeIdentifier)' == ''"
+      Text="Unsupported platform '$(Platform)'. Supported platforms are x64 and ARM64." />
+    <Error
+      Condition="!Exists('$(WinUiOutputDirectory)\resources.pri')"
+      Text="The WinUI build did not produce resources.pri at '$(WinUiOutputDirectory)\resources.pri'." />
+    <Copy SourceFiles="$(WinUiOutputDirectory)\resources.pri" DestinationFiles="$(TargetDir)resources.pri" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

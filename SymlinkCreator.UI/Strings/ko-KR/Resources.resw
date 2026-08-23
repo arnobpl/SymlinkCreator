@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ApplicationName" xml:space="preserve"><value>Symlink Creator</value></data>
+  <data name="SourceListHeader.Text" xml:space="preserve"><value>원본 파일 또는 폴더 목록:</value></data>
+  <data name="SourceListView.ToolTip" xml:space="preserve"><value>파일이나 폴더를 추가하거나 여기에 끌어다 놓으세요.</value></data>
+  <data name="AddFilesButton.Content" xml:space="preserve"><value>파일 추가</value></data>
+  <data name="AddFilesButton.ToolTip" xml:space="preserve"><value>심볼릭 링크 원본으로 추가할 파일을 하나 이상 선택하세요.</value></data>
+  <data name="AddFoldersButton.Content" xml:space="preserve"><value>폴더 추가</value></data>
+  <data name="AddFoldersButton.ToolTip" xml:space="preserve"><value>심볼릭 링크 원본으로 추가할 폴더를 하나 이상 선택하세요.</value></data>
+  <data name="RemoveSelectedButton.Content" xml:space="preserve"><value>선택 항목 제거</value></data>
+  <data name="RemoveSelectedButton.ToolTip" xml:space="preserve"><value>선택한 원본을 목록에서 제거합니다.</value></data>
+  <data name="ClearListButton.Content" xml:space="preserve"><value>목록 지우기</value></data>
+  <data name="ClearListButton.ToolTip" xml:space="preserve"><value>목록에서 모든 원본을 제거합니다.</value></data>
+  <data name="DestinationPathHeader.Text" xml:space="preserve"><value>대상 경로:</value></data>
+  <data name="DestinationPathTextBox.ToolTip" xml:space="preserve"><value>심볼릭 링크를 만들 폴더를 입력하거나 여기에 끌어다 놓으세요.</value></data>
+  <data name="BrowseButton.Content" xml:space="preserve"><value>찾아보기</value></data>
+  <data name="BrowseButton.ToolTip" xml:space="preserve"><value>대상 폴더를 선택합니다.</value></data>
+  <data name="RelativePathCheckBox.Content" xml:space="preserve"><value>가능하면 상대 경로 사용</value></data>
+  <data name="RelativePathCheckBox.ToolTip" xml:space="preserve"><value>원본과 대상이 같은 드라이브에 있는 경우 심볼릭 링크 대상에 상대 경로를 사용합니다. 그렇지 않으면 원본의 전체 경로를 사용합니다.</value></data>
+  <data name="RetainScriptCheckBox.Content" xml:space="preserve"><value>실행 후 바탕 화면에 스크립트 파일 유지</value></data>
+  <data name="RetainScriptCheckBox.ToolTip" xml:space="preserve"><value>심볼릭 링크를 만든 후 생성된 .cmd 스크립트를 바탕 화면에 유지합니다. 사용된 명령이 기록되므로 문제 해결에 도움이 됩니다.</value></data>
+  <data name="HideSuccessCheckBox.Content" xml:space="preserve"><value>성공 확인 대화 상자 숨기기</value></data>
+  <data name="HideSuccessCheckBox.ToolTip" xml:space="preserve"><value>심볼릭 링크 생성에 성공한 후 확인 대화 상자를 표시하지 않습니다. 오류 및 취소된 작업은 계속 표시됩니다.</value></data>
+  <data name="CreateSymlinksButtonLabel.Text" xml:space="preserve"><value>심볼릭 링크 만들기</value></data>
+  <data name="CreateSymlinksButton.ToolTip" xml:space="preserve"><value>목록에 있는 각 원본에 대한 심볼릭 링크를 만듭니다. Windows에서 관리자 권한을 요청할 수 있습니다.</value></data>
+  <data name="CreateSymlinksButton.AccessibleName" xml:space="preserve"><value>심볼릭 링크 만들기</value></data>
+  <data name="CreateSymlinksButton.HelpText" xml:space="preserve"><value>Windows에서 관리자 권한을 요청할 수 있습니다.</value></data>
+  <data name="ElevationWarning.Message" xml:space="preserve"><value>관리자 권한으로 {0}을(를) 실행하면 끌어서 놓기가 작동하지 않을 수 있습니다. 관리자 권한이 필요한 작업은 심볼릭 링크 생성뿐입니다. 끌어서 놓기를 사용하려면 관리자 권한 없이 앱을 다시 시작하세요.</value></data>
+  <data name="ElevationWarning.Title" xml:space="preserve"><value>경고</value></data>
+  <data name="AboutButton.Content" xml:space="preserve"><value>정보</value></data>
+  <data name="AboutButton.ToolTip" xml:space="preserve"><value>앱 버전과 프로젝트 웹 사이트를 봅니다.</value></data>
+  <data name="NoSourcesError" xml:space="preserve"><value>파일 또는 폴더를 선택하지 않았습니다.</value></data>
+  <data name="DestinationEmptyError" xml:space="preserve"><value>대상 경로가 비어 있습니다.</value></data>
+  <data name="DestinationNotFoundFormat" xml:space="preserve"><value>대상 경로가 없습니다: {0}</value></data>
+  <data name="DestinationInvalidCharactersError" xml:space="preserve"><value>대상 경로에 잘못된 문자가 포함되어 있습니다.</value></data>
+  <data name="DestinationInvalidFormat" xml:space="preserve"><value>대상 경로가 잘못되었습니다: {0}</value></data>
+  <data name="SourceEmptyError" xml:space="preserve"><value>원본 경로가 비어 있습니다.</value></data>
+  <data name="SourceNotFoundFormat" xml:space="preserve"><value>원본 경로가 없습니다: {0}</value></data>
+  <data name="SourceInvalidCharactersError" xml:space="preserve"><value>원본 경로에 잘못된 문자가 포함되어 있습니다.</value></data>
+  <data name="SourceInvalidFormat" xml:space="preserve"><value>원본 경로가 잘못되었습니다: {0}</value></data>
+  <data name="DuplicateLinkNameFormat" xml:space="preserve"><value>여러 원본 경로에서 중복 링크 이름 '{0}'이(가) 만들어집니다.</value></data>
+  <data name="DestinationEntryExistsFormat" xml:space="preserve"><value>대상에 이미 '{0}'이(가) 있습니다.</value></data>
+  <data name="InvalidLinkNameFormat" xml:space="preserve"><value>원본 경로를 링크 이름으로 사용할 수 없습니다: {0}</value></data>
+  <data name="EmptyPlanError" xml:space="preserve"><value>생성할 심볼릭 링크 항목이 없습니다.</value></data>
+  <data name="GeneratedPathInvalidCharactersError" xml:space="preserve"><value>생성된 스크립트 경로에 잘못된 문자가 포함되어 있습니다.</value></data>
+  <data name="DestinationDropError" xml:space="preserve"><value>대상으로 사용할 기존 폴더 하나를 끌어다 놓으세요.</value></data>
+  <data name="DroppedInputErrorFormat" xml:space="preserve"><value>끌어다 놓은 항목을 읽을 수 없습니다. {0}</value></data>
+  <data name="PickerErrorFormat" xml:space="preserve"><value>파일 또는 폴더 선택기를 열 수 없습니다. {0}</value></data>
+  <data name="ExecutionCompleted" xml:space="preserve"><value>실행이 완료되었습니다.</value></data>
+  <data name="ExecutionFailed" xml:space="preserve"><value>심볼릭 링크를 만들지 못했습니다.</value></data>
+  <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>심볼릭 링크 생성을 시작할 수 없습니다. {0}</value></data>
+  <data name="ElevationCanceled" xml:space="preserve"><value>관리자 권한 요청이 취소되었습니다.</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>Symlink Creator 정보</value></data>
+  <data name="AboutDeveloperFormat" xml:space="preserve"><value>개발자: {0}</value></data>
+  <data name="AboutWebsiteLabel" xml:space="preserve"><value>프로젝트 웹 사이트</value></data>
+  <data name="AppTitleBar.TitleFormat" xml:space="preserve"><value>{0} v{1}</value></data>
+  <data name="ErrorDialog.Title" xml:space="preserve"><value>오류</value></data>
+  <data name="SuccessDialog.Title" xml:space="preserve"><value>완료</value></data>
+  <data name="DialogOk.Content" xml:space="preserve"><value>확인</value></data>
+</root>

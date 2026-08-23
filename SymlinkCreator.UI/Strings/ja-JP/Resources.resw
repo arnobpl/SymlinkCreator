@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ApplicationName" xml:space="preserve"><value>Symlink Creator</value></data>
+  <data name="SourceListHeader.Text" xml:space="preserve"><value>ソース ファイルまたはフォルダーの一覧:</value></data>
+  <data name="SourceListView.ToolTip" xml:space="preserve"><value>ファイルまたはフォルダーを追加するか、ここにドラッグ アンド ドロップします。</value></data>
+  <data name="AddFilesButton.Content" xml:space="preserve"><value>ファイルを追加</value></data>
+  <data name="AddFilesButton.ToolTip" xml:space="preserve"><value>シンボリック リンクのソースとして追加するファイルを 1 つ以上選択します。</value></data>
+  <data name="AddFoldersButton.Content" xml:space="preserve"><value>フォルダーを追加</value></data>
+  <data name="AddFoldersButton.ToolTip" xml:space="preserve"><value>シンボリック リンクのソースとして追加するフォルダーを 1 つ以上選択します。</value></data>
+  <data name="RemoveSelectedButton.Content" xml:space="preserve"><value>選択項目を削除</value></data>
+  <data name="RemoveSelectedButton.ToolTip" xml:space="preserve"><value>選択したソースを一覧から削除します。</value></data>
+  <data name="ClearListButton.Content" xml:space="preserve"><value>一覧をクリア</value></data>
+  <data name="ClearListButton.ToolTip" xml:space="preserve"><value>一覧からすべてのソースを削除します。</value></data>
+  <data name="DestinationPathHeader.Text" xml:space="preserve"><value>作成先パス:</value></data>
+  <data name="DestinationPathTextBox.ToolTip" xml:space="preserve"><value>シンボリック リンクを作成するフォルダーを入力するか、ここにドラッグ アンド ドロップします。</value></data>
+  <data name="BrowseButton.Content" xml:space="preserve"><value>参照</value></data>
+  <data name="BrowseButton.ToolTip" xml:space="preserve"><value>作成先フォルダーを選択します。</value></data>
+  <data name="RelativePathCheckBox.Content" xml:space="preserve"><value>可能な場合は相対パスを使用</value></data>
+  <data name="RelativePathCheckBox.ToolTip" xml:space="preserve"><value>ソースと作成先が同じドライブにある場合、シンボリック リンクのターゲットに相対パスを使用します。それ以外の場合は、ソースの完全なパスを使用します。</value></data>
+  <data name="RetainScriptCheckBox.Content" xml:space="preserve"><value>実行後もスクリプト ファイルをデスクトップに残す</value></data>
+  <data name="RetainScriptCheckBox.ToolTip" xml:space="preserve"><value>シンボリック リンクの作成後も、生成された .cmd スクリプトをデスクトップに残します。使用したコマンドが記録されるため、トラブルシューティングに役立ちます。</value></data>
+  <data name="HideSuccessCheckBox.Content" xml:space="preserve"><value>成功時の確認ダイアログを非表示</value></data>
+  <data name="HideSuccessCheckBox.ToolTip" xml:space="preserve"><value>シンボリック リンクの作成に成功した後、確認ダイアログを表示しません。エラーやキャンセルされた操作は引き続き表示されます。</value></data>
+  <data name="CreateSymlinksButtonLabel.Text" xml:space="preserve"><value>シンボリック リンクを作成</value></data>
+  <data name="CreateSymlinksButton.ToolTip" xml:space="preserve"><value>一覧にある各ソースのシンボリック リンクを作成します。Windows によって管理者権限を求められる場合があります。</value></data>
+  <data name="CreateSymlinksButton.AccessibleName" xml:space="preserve"><value>シンボリック リンクを作成</value></data>
+  <data name="CreateSymlinksButton.HelpText" xml:space="preserve"><value>Windows によって管理者権限を求められる場合があります。</value></data>
+  <data name="ElevationWarning.Message" xml:space="preserve"><value>管理者として {0} を実行すると、ドラッグ アンド ドロップが機能しなくなる可能性があります。管理者権限が必要なのはシンボリック リンクの作成だけです。ドラッグ アンド ドロップを有効にするには、管理者権限なしでアプリを再起動してください。</value></data>
+  <data name="ElevationWarning.Title" xml:space="preserve"><value>警告</value></data>
+  <data name="AboutButton.Content" xml:space="preserve"><value>バージョン情報</value></data>
+  <data name="AboutButton.ToolTip" xml:space="preserve"><value>アプリのバージョンとプロジェクト Web サイトを表示します。</value></data>
+  <data name="NoSourcesError" xml:space="preserve"><value>ファイルまたはフォルダーが選択されていません。</value></data>
+  <data name="DestinationEmptyError" xml:space="preserve"><value>作成先パスが空です。</value></data>
+  <data name="DestinationNotFoundFormat" xml:space="preserve"><value>作成先パスが存在しません: {0}</value></data>
+  <data name="DestinationInvalidCharactersError" xml:space="preserve"><value>作成先パスに無効な文字が含まれています。</value></data>
+  <data name="DestinationInvalidFormat" xml:space="preserve"><value>作成先パスが無効です: {0}</value></data>
+  <data name="SourceEmptyError" xml:space="preserve"><value>ソース パスが空です。</value></data>
+  <data name="SourceNotFoundFormat" xml:space="preserve"><value>ソース パスが存在しません: {0}</value></data>
+  <data name="SourceInvalidCharactersError" xml:space="preserve"><value>ソース パスに無効な文字が含まれています。</value></data>
+  <data name="SourceInvalidFormat" xml:space="preserve"><value>ソース パスが無効です: {0}</value></data>
+  <data name="DuplicateLinkNameFormat" xml:space="preserve"><value>複数のソース パスによって、重複するリンク名「{0}」が作成されます。</value></data>
+  <data name="DestinationEntryExistsFormat" xml:space="preserve"><value>作成先には既に「{0}」が存在します。</value></data>
+  <data name="InvalidLinkNameFormat" xml:space="preserve"><value>ソース パスをリンク名として使用できません: {0}</value></data>
+  <data name="EmptyPlanError" xml:space="preserve"><value>シンボリック リンクの計画にエントリがありません。</value></data>
+  <data name="GeneratedPathInvalidCharactersError" xml:space="preserve"><value>生成されたスクリプト パスに無効な文字が含まれています。</value></data>
+  <data name="DestinationDropError" xml:space="preserve"><value>作成先として使用する既存のフォルダーを 1 つドロップしてください。</value></data>
+  <data name="DroppedInputErrorFormat" xml:space="preserve"><value>ドロップされた項目を読み取れませんでした。{0}</value></data>
+  <data name="PickerErrorFormat" xml:space="preserve"><value>ファイルまたはフォルダーの選択画面を開けませんでした。{0}</value></data>
+  <data name="ExecutionCompleted" xml:space="preserve"><value>実行が完了しました。</value></data>
+  <data name="ExecutionFailed" xml:space="preserve"><value>シンボリック リンクの作成に失敗しました。</value></data>
+  <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>シンボリック リンクの作成を開始できませんでした。{0}</value></data>
+  <data name="ElevationCanceled" xml:space="preserve"><value>管理者権限の要求がキャンセルされました。</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>Symlink Creator のバージョン情報</value></data>
+  <data name="AboutDeveloperFormat" xml:space="preserve"><value>開発者: {0}</value></data>
+  <data name="AboutWebsiteLabel" xml:space="preserve"><value>プロジェクト Web サイト</value></data>
+  <data name="AppTitleBar.TitleFormat" xml:space="preserve"><value>{0} v{1}</value></data>
+  <data name="ErrorDialog.Title" xml:space="preserve"><value>エラー</value></data>
+  <data name="SuccessDialog.Title" xml:space="preserve"><value>完了</value></data>
+  <data name="DialogOk.Content" xml:space="preserve"><value>OK</value></data>
+</root>

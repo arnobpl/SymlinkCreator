@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+repository_root="$(git rev-parse --show-toplevel)"
+cd "$repository_root"
+
+git diff --cached --check
+
+if ! command -v pwsh >/dev/null 2>&1; then
+    echo >&2 "PowerShell 7.4 or newer is required for pre-commit checks. Install it and retry."
+    exit 1
+fi
+
+pwsh -NoProfile -File ./scripts/Build.ps1 -Verify

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ApplicationName" xml:space="preserve"><value>Symlink Creator</value></data>
+  <data name="SourceListHeader.Text" xml:space="preserve"><value>Liste der Quelldateien oder -ordner:</value></data>
+  <data name="SourceListView.ToolTip" xml:space="preserve"><value>Fügen Sie Dateien oder Ordner hinzu, oder ziehen Sie sie hierher.</value></data>
+  <data name="AddFilesButton.Content" xml:space="preserve"><value>Dateien hinzufügen</value></data>
+  <data name="AddFilesButton.ToolTip" xml:space="preserve"><value>Wählen Sie eine oder mehrere Dateien als Quellen für symbolische Links aus.</value></data>
+  <data name="AddFoldersButton.Content" xml:space="preserve"><value>Ordner hinzufügen</value></data>
+  <data name="AddFoldersButton.ToolTip" xml:space="preserve"><value>Wählen Sie einen oder mehrere Ordner als Quellen für symbolische Links aus.</value></data>
+  <data name="RemoveSelectedButton.Content" xml:space="preserve"><value>Ausgewählte entfernen</value></data>
+  <data name="RemoveSelectedButton.ToolTip" xml:space="preserve"><value>Entfernen Sie die ausgewählten Quellen aus der Liste.</value></data>
+  <data name="ClearListButton.Content" xml:space="preserve"><value>Liste leeren</value></data>
+  <data name="ClearListButton.ToolTip" xml:space="preserve"><value>Entfernen Sie alle Quellen aus der Liste.</value></data>
+  <data name="DestinationPathHeader.Text" xml:space="preserve"><value>Zielpfad:</value></data>
+  <data name="DestinationPathTextBox.ToolTip" xml:space="preserve"><value>Geben Sie den Ordner ein, oder ziehen Sie ihn hierher, in dem die symbolischen Links erstellt werden.</value></data>
+  <data name="BrowseButton.Content" xml:space="preserve"><value>Durchsuchen</value></data>
+  <data name="BrowseButton.ToolTip" xml:space="preserve"><value>Wählen Sie den Zielordner aus.</value></data>
+  <data name="RelativePathCheckBox.Content" xml:space="preserve"><value>Wenn möglich relative Pfade verwenden</value></data>
+  <data name="RelativePathCheckBox.ToolTip" xml:space="preserve"><value>Relative Pfade für symbolische Linkziele verwenden, wenn Quelle und Ziel auf demselben Laufwerk liegen. Andernfalls den vollständigen Quellpfad verwenden.</value></data>
+  <data name="RetainScriptCheckBox.Content" xml:space="preserve"><value>Das Skript nach der Ausführung auf dem Desktop behalten</value></data>
+  <data name="RetainScriptCheckBox.ToolTip" xml:space="preserve"><value>Die generierte .cmd-Datei nach dem Erstellen symbolischer Links auf dem Desktop behalten. Sie zeichnet die verwendeten Befehle auf und kann bei der Problembehebung helfen.</value></data>
+  <data name="HideSuccessCheckBox.Content" xml:space="preserve"><value>Dialog für erfolgreiche Vorgänge ausblenden</value></data>
+  <data name="HideSuccessCheckBox.ToolTip" xml:space="preserve"><value>Nach erfolgreicher Erstellung symbolischer Links keinen Bestätigungsdialog anzeigen. Fehler und abgebrochene Vorgänge werden weiterhin angezeigt.</value></data>
+  <data name="CreateSymlinksButtonLabel.Text" xml:space="preserve"><value>Symbolische Links erstellen</value></data>
+  <data name="CreateSymlinksButton.ToolTip" xml:space="preserve"><value>Erstellt symbolische Links für jede Quelle in der Liste. Windows fordert möglicherweise Administratorrechte an.</value></data>
+  <data name="CreateSymlinksButton.AccessibleName" xml:space="preserve"><value>Symbolische Links erstellen</value></data>
+  <data name="CreateSymlinksButton.HelpText" xml:space="preserve"><value>Windows fordert möglicherweise Administratorrechte an.</value></data>
+  <data name="ElevationWarning.Message" xml:space="preserve"><value>Wenn {0} als Administrator ausgeführt wird, funktioniert Drag &amp; Drop möglicherweise nicht. Nur die Erstellung symbolischer Links erfordert Administratorrechte. Starten Sie die Anwendung ohne Administratorrechte neu, um Drag &amp; Drop zu aktivieren.</value></data>
+  <data name="ElevationWarning.Title" xml:space="preserve"><value>Warnung</value></data>
+  <data name="AboutButton.Content" xml:space="preserve"><value>Info</value></data>
+  <data name="AboutButton.ToolTip" xml:space="preserve"><value>Zeigt die Anwendungsversion und die Projektwebsite an.</value></data>
+  <data name="NoSourcesError" xml:space="preserve"><value>Es wurden keine Dateien oder Ordner ausgewählt.</value></data>
+  <data name="DestinationEmptyError" xml:space="preserve"><value>Der Zielpfad ist leer.</value></data>
+  <data name="DestinationNotFoundFormat" xml:space="preserve"><value>Der Zielpfad ist nicht vorhanden: {0}</value></data>
+  <data name="DestinationInvalidCharactersError" xml:space="preserve"><value>Der Zielpfad enthält ungültige Zeichen.</value></data>
+  <data name="DestinationInvalidFormat" xml:space="preserve"><value>Der Zielpfad ist ungültig: {0}</value></data>
+  <data name="SourceEmptyError" xml:space="preserve"><value>Der Quellpfad ist leer.</value></data>
+  <data name="SourceNotFoundFormat" xml:space="preserve"><value>Der Quellpfad ist nicht vorhanden: {0}</value></data>
+  <data name="SourceInvalidCharactersError" xml:space="preserve"><value>Der Quellpfad enthält ungültige Zeichen.</value></data>
+  <data name="SourceInvalidFormat" xml:space="preserve"><value>Der Quellpfad ist ungültig: {0}</value></data>
+  <data name="DuplicateLinkNameFormat" xml:space="preserve"><value>Mehrere Quellpfade würden den doppelten Linknamen „{0}“ erstellen.</value></data>
+  <data name="DestinationEntryExistsFormat" xml:space="preserve"><value>Das Ziel enthält bereits „{0}“.</value></data>
+  <data name="InvalidLinkNameFormat" xml:space="preserve"><value>Der Quellpfad kann nicht als Linkname verwendet werden: {0}</value></data>
+  <data name="EmptyPlanError" xml:space="preserve"><value>Der Plan für symbolische Links enthält keine Einträge.</value></data>
+  <data name="GeneratedPathInvalidCharactersError" xml:space="preserve"><value>Ein generierter Skriptpfad enthält ungültige Zeichen.</value></data>
+  <data name="DestinationDropError" xml:space="preserve"><value>Ziehen Sie einen vorhandenen Ordner als Ziel hierher.</value></data>
+  <data name="DroppedInputErrorFormat" xml:space="preserve"><value>Das gezogene Element konnte nicht gelesen werden. {0}</value></data>
+  <data name="PickerErrorFormat" xml:space="preserve"><value>Die Datei- oder Ordnerauswahl konnte nicht geöffnet werden. {0}</value></data>
+  <data name="ExecutionCompleted" xml:space="preserve"><value>Ausführung abgeschlossen.</value></data>
+  <data name="ExecutionFailed" xml:space="preserve"><value>Die Erstellung symbolischer Links ist fehlgeschlagen.</value></data>
+  <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>Die Erstellung symbolischer Links konnte nicht gestartet werden. {0}</value></data>
+  <data name="ElevationCanceled" xml:space="preserve"><value>Die Anforderung der Administratorrechte wurde abgebrochen.</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>Info zu Symlink Creator</value></data>
+  <data name="AboutDeveloperFormat" xml:space="preserve"><value>Entwickelt von {0}</value></data>
+  <data name="AboutWebsiteLabel" xml:space="preserve"><value>Projektwebsite</value></data>
+  <data name="AppTitleBar.TitleFormat" xml:space="preserve"><value>{0} v{1}</value></data>
+  <data name="ErrorDialog.Title" xml:space="preserve"><value>Fehler</value></data>
+  <data name="SuccessDialog.Title" xml:space="preserve"><value>Fertig</value></data>
+  <data name="DialogOk.Content" xml:space="preserve"><value>OK</value></data>
+</root>
