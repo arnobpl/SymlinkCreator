@@ -1,5 +1,3 @@
-using SymlinkCreator.Core;
-
 namespace SymlinkCreator.Tests;
 
 [TestClass]

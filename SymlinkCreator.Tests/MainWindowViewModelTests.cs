@@ -1,5 +1,3 @@
-using SymlinkCreator.Core;
-
 namespace SymlinkCreator.Tests;
 
 [TestClass]
@@ -144,7 +142,7 @@ public sealed class MainWindowViewModelTests
     [DataRow(SymlinkValidationError.InvalidLinkName, "The source path cannot be used as a link name: C:\\", "C:\\")]
     [DataRow(SymlinkValidationError.EmptyPlan, "The symlink plan contains no entries.", null)]
     [DataRow(SymlinkValidationError.GeneratedPathContainsInvalidCharacters, "A generated script path contains invalid characters.", null)]
-    public void TryCreateSymlinksLocalizesCoreValidationErrors(
+    public void TryCreateSymlinksLocalizesValidationErrors(
         SymlinkValidationError error,
         string expectedMessage,
         string? messageArgument)

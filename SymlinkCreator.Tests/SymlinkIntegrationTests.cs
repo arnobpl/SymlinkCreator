@@ -1,7 +1,5 @@
 using System.Diagnostics;
 using System.Text;
-using SymlinkCreator.Core;
-
 namespace SymlinkCreator.Tests;
 
 [TestClass]

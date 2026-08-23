@@ -1,4 +1,4 @@
-namespace SymlinkCreator;
+namespace SymlinkCreator.Application.Presentation;
 
 public sealed record StartupOptions(
     bool SuppressElevationWarning = false,
@@ -7,18 +7,18 @@ public sealed record StartupOptions(
     bool HideSuccessfulOperationDialog = false,
     string? Language = null)
 {
-    private static readonly Dictionary<string, string> SupportedLanguages =
+    private static readonly HashSet<string> SupportedLanguages =
         new(StringComparer.OrdinalIgnoreCase)
         {
-            ["en-US"] = "en-US",
-            ["zh-CN"] = "zh-CN",
-            ["es"] = "es",
-            ["de"] = "de",
-            ["fr"] = "fr",
-            ["bn-BD"] = "bn-BD",
-            ["ja-JP"] = "ja-JP",
-            ["pt-BR"] = "pt-BR",
-            ["ko-KR"] = "ko-KR"
+            "en-US",
+            "zh-CN",
+            "es",
+            "de",
+            "fr",
+            "bn-BD",
+            "ja-JP",
+            "pt-BR",
+            "ko-KR"
         };
 
     public static StartupOptions Parse(string? arguments)

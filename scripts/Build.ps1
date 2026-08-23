@@ -32,6 +32,26 @@ $TargetPlatform = switch ($TargetPlatform.Trim().ToUpperInvariant()) {
 }
 
 $repositoryRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$temporaryDrive = $null
+if ($Verify -and $repositoryRoot.Contains('#', [StringComparison]::Ordinal)) {
+    $driveLetter = 90..68 |
+        ForEach-Object { [char] $_ } |
+        Where-Object { $null -eq (Get-PSDrive -Name $_ -ErrorAction SilentlyContinue) } |
+        Select-Object -First 1
+    if ($null -eq $driveLetter) {
+        throw 'C# verification requires an available drive letter when the repository path contains #.'
+    }
+
+    $temporaryDrive = "${driveLetter}:"
+    & subst.exe $temporaryDrive $repositoryRoot
+    if ($LASTEXITCODE -ne 0) {
+        throw "Could not map '$repositoryRoot' to temporary drive $temporaryDrive."
+    }
+
+    $repositoryRoot = "$temporaryDrive\"
+    Write-Information "Using $temporaryDrive for C# verification because Roslyn namespace analysis ignores paths containing #." -InformationAction Continue
+}
+
 $projectPath = Join-Path $repositoryRoot 'SymlinkCreator.UI\SymlinkCreator.UI.csproj'
 
 Push-Location $repositoryRoot
@@ -143,4 +163,10 @@ try {
 }
 finally {
     Pop-Location
+    if ($null -ne $temporaryDrive) {
+        & subst.exe $temporaryDrive /D
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Temporary drive $temporaryDrive could not be removed."
+        }
+    }
 }

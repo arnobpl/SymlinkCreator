@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 
-namespace SymlinkCreator.Core;
+namespace SymlinkCreator.Application.Core;
 
 public sealed record ProcessExecutionResult(int ExitCode, string StandardError, bool WasCancelled = false);
 

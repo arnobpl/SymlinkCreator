@@ -1,5 +1,5 @@
 using Microsoft.Windows.ApplicationModel.Resources;
-using SymlinkCreator.Core;
+using SymlinkCreator.Application.Presentation;
 
 namespace SymlinkCreator.Localization;
 

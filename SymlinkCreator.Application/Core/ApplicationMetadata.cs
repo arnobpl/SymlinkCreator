@@ -1,4 +1,4 @@
-namespace SymlinkCreator.Core;
+namespace SymlinkCreator.Application.Core;
 
 public static class ApplicationMetadata
 {

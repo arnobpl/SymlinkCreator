@@ -3,7 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SymlinkCreator" />
+    <InternalsVisibleTo Include="SymlinkCreator.Tests" />
+  </ItemGroup>
 
 </Project>

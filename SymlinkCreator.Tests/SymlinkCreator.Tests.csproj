@@ -5,6 +5,7 @@
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
     <Platforms>x64;ARM64</Platforms>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>enable</ImplicitUsings>
     <MSTestAnalysisMode>Recommended</MSTestAnalysisMode>
     <Nullable>enable</Nullable>
@@ -17,15 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SymlinkCreator.Core\SymlinkCreator.Core.csproj" />
+    <ProjectReference Include="..\SymlinkCreator.Application\SymlinkCreator.Application.csproj" />
+    <!-- Build XAML and resources without loading the WinUI executable into testhost. -->
     <ProjectReference Include="..\SymlinkCreator.UI\SymlinkCreator.UI.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Test the non-XAML UI logic without loading the WinExe bootstrap module in testhost. -->
-    <Compile Include="..\SymlinkCreator.UI\MainWindowViewModel.cs" Link="UI\MainWindowViewModel.cs" />
-    <Compile Include="..\SymlinkCreator.UI\StartupOptions.cs" Link="UI\StartupOptions.cs" />
-    <Compile Include="..\SymlinkCreator.UI\WindowsPath.cs" Link="UI\WindowsPath.cs" />
     <Content Include="..\SymlinkCreator.UI\Strings\**\Resources.resw" LinkBase="Strings" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

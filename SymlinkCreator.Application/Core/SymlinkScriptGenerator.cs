@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace SymlinkCreator.Core;
+namespace SymlinkCreator.Application.Core;
 
 public interface ISymlinkScriptGenerator
 {

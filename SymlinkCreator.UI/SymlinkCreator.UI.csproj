@@ -53,11 +53,7 @@
     <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SymlinkCreator.Core\SymlinkCreator.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <InternalsVisibleTo Include="SymlinkCreator.Tests" />
+    <ProjectReference Include="..\SymlinkCreator.Application\SymlinkCreator.Application.csproj" />
   </ItemGroup>
 
   <!-- Publish Properties -->

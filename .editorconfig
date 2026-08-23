@@ -15,6 +15,7 @@ dotnet_diagnostic.IDE0090.severity = error
 dotnet_diagnostic.IDE0130.severity = error
 dotnet_diagnostic.IDE0290.severity = error
 dotnet_diagnostic.MSTEST0049.severity = error
+dotnet_analyzer_diagnostic.category-Interoperability.severity = error
 dotnet_style_namespace_match_folder = true:error
 dotnet_style_prefer_collection_expression = true:error
 csharp_prefer_braces = true:error

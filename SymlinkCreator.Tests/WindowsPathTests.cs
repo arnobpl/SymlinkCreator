@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace SymlinkCreator.Tests;
 
 [TestClass]
-public sealed class WindowsPathTests
+public sealed partial class WindowsPathTests
 {
     [TestMethod]
     public void ExpandShortNamesRestoresTheCanonicalPickerPath()
@@ -37,9 +37,9 @@ public sealed class WindowsPathTests
             : new string(buffer, 0, checked((int)length));
     }
 
-    [DllImport("kernel32.dll", EntryPoint = "GetShortPathNameW", CharSet = CharSet.Unicode)]
+    [LibraryImport("kernel32.dll", EntryPoint = "GetShortPathNameW", StringMarshalling = StringMarshalling.Utf16)]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-    private static extern uint GetShortPathName(
+    private static partial uint GetShortPathName(
         string longPath,
         [Out] char[] shortPath,
         uint bufferLength);

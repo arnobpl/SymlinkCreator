@@ -1,8 +1,8 @@
 using System.Runtime.InteropServices;
 
-namespace SymlinkCreator;
+namespace SymlinkCreator.Application.Platform;
 
-internal static class WindowsPath
+internal static partial class WindowsPath
 {
     public static string ExpandShortNames(string path)
     {
@@ -29,9 +29,9 @@ internal static class WindowsPath
         return new string(buffer, 0, checked((int)length));
     }
 
-    [DllImport("kernel32.dll", EntryPoint = "GetLongPathNameW", CharSet = CharSet.Unicode)]
+    [LibraryImport("kernel32.dll", EntryPoint = "GetLongPathNameW", StringMarshalling = StringMarshalling.Utf16)]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-    private static extern uint GetLongPathName(
+    private static partial uint GetLongPathName(
         string shortPath,
         [Out] char[] longPath,
         uint bufferLength);

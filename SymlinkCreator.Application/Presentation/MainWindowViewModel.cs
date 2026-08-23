@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using SymlinkCreator.Core;
+using SymlinkCreator.Application.Core;
 
-namespace SymlinkCreator;
+namespace SymlinkCreator.Application.Presentation;
 
 public sealed class MainWindowViewModel(
     ISymlinkOperationService operationService,

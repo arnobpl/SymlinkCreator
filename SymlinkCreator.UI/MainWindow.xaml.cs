@@ -2,7 +2,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Windows.Storage.Pickers;
-using SymlinkCreator.Core;
+using SymlinkCreator.Application.Core;
+using SymlinkCreator.Application.Platform;
+using SymlinkCreator.Application.Presentation;
 using System.Globalization;
 using System.Security.Principal;
 using Windows.ApplicationModel.DataTransfer;
@@ -33,9 +35,9 @@ public sealed partial class MainWindow : Window
         RemoveSelectedButton.Click += RemoveSelectedButton_Click;
         ClearListButton.Click += ClearListButton_Click;
         SourceListView.Drop += SourceListView_Drop;
-        SourceListView.DragOver += SourceListView_DragOver;
+        SourceListView.DragOver += DroppedPaths_DragOver;
         DestinationPathTextBox.Drop += DestinationPathTextBox_Drop;
-        DestinationPathTextBox.DragOver += DestinationPathTextBox_DragOver;
+        DestinationPathTextBox.DragOver += DroppedPaths_DragOver;
         BrowseButton.Click += BrowseButton_Click;
         CreateSymlinksButton.Click += CreateSymlinksButton_Click;
         AboutButton.Click += AboutButton_Click;
@@ -130,7 +132,7 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            await ShowPickerErrorAsync(exception);
+            await ShowFormattedErrorAsync("PickerErrorFormat", exception);
             return;
         }
 
@@ -153,7 +155,7 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            await ShowPickerErrorAsync(exception);
+            await ShowFormattedErrorAsync("PickerErrorFormat", exception);
             return;
         }
 
@@ -204,13 +206,13 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            await ShowInputErrorAsync(exception);
+            await ShowFormattedErrorAsync("DroppedInputErrorFormat", exception);
         }
 
         e.Handled = true;
     }
 
-    private void SourceListView_DragOver(object sender, DragEventArgs e)
+    private void DroppedPaths_DragOver(object sender, DragEventArgs e)
     {
         _ = sender;
         e.AcceptedOperation = ContainsDroppedPaths(e.DataView)
@@ -239,18 +241,9 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            await ShowInputErrorAsync(exception);
+            await ShowFormattedErrorAsync("DroppedInputErrorFormat", exception);
         }
 
-        e.Handled = true;
-    }
-
-    private void DestinationPathTextBox_DragOver(object sender, DragEventArgs e)
-    {
-        _ = sender;
-        e.AcceptedOperation = ContainsDroppedPaths(e.DataView)
-            ? DataPackageOperation.Copy
-            : DataPackageOperation.None;
         e.Handled = true;
     }
 
@@ -268,7 +261,7 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            await ShowPickerErrorAsync(exception);
+            await ShowFormattedErrorAsync("PickerErrorFormat", exception);
             return;
         }
 
@@ -405,20 +398,11 @@ public sealed partial class MainWindow : Window
         _ = await dialog.ShowAsync();
     }
 
-    private Task ShowPickerErrorAsync(Exception exception)
+    private Task ShowFormattedErrorAsync(string formatResourceKey, Exception exception)
     {
         string message = string.Format(
             CultureInfo.CurrentCulture,
-            StringResources.GetString("PickerErrorFormat"),
-            exception.Message);
-        return ShowMessageAsync(StringResources.GetString("ErrorDialog.Title"), message);
-    }
-
-    private Task ShowInputErrorAsync(Exception exception)
-    {
-        string message = string.Format(
-            CultureInfo.CurrentCulture,
-            StringResources.GetString("DroppedInputErrorFormat"),
+            StringResources.GetString(formatResourceKey),
             exception.Message);
         return ShowMessageAsync(StringResources.GetString("ErrorDialog.Title"), message);
     }

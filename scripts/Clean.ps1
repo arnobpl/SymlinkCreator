@@ -10,10 +10,11 @@ $repositoryRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $generatedDirectories = @(
     'SymlinkCreator.UI\bin',
     'SymlinkCreator.UI\obj',
-    'SymlinkCreator.Core\bin',
-    'SymlinkCreator.Core\obj',
+    'SymlinkCreator.Application\bin',
+    'SymlinkCreator.Application\obj',
     'SymlinkCreator.Tests\bin',
     'SymlinkCreator.Tests\obj',
+    'SymlinkCreator.Tests\TestResults',
     'artifacts'
 )
 

@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace SymlinkCreator.Core;
+namespace SymlinkCreator.Application.Core;
 
 public sealed class ScriptWorkspace(
     string? rootDirectory = null,
