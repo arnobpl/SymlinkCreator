@@ -47,28 +47,6 @@ $wingetTemplateDirectory = Join-Path $repositoryRoot 'scripts\winget'
 # APPINSTALLER_CLI_ERROR_MANIFEST_VALIDATION_WARNING
 $wingetManifestValidationWarning = [int32]0x8A150028
 
-$commitTimestampText = & git -C $repositoryRoot show -s --format=%ct HEAD
-if ($LASTEXITCODE -ne 0) {
-    throw 'Unable to read the HEAD commit timestamp used for reproducible ZIP metadata.'
-}
-$commitTimestampText = ([string] $commitTimestampText).Trim()
-$commitTimestampSeconds = [long] 0
-if (-not [long]::TryParse(
-        $commitTimestampText,
-        [System.Globalization.NumberStyles]::None,
-        [System.Globalization.CultureInfo]::InvariantCulture,
-        [ref] $commitTimestampSeconds)) {
-    throw "Git returned an invalid HEAD commit timestamp '$commitTimestampText'."
-}
-$archiveTimestamp = [System.DateTimeOffset]::FromUnixTimeSeconds($commitTimestampSeconds).ToUniversalTime()
-# ZIP stores seconds at two-second precision; normalize once so repeated builds have identical metadata.
-$archiveTimestamp = $archiveTimestamp.AddSeconds(-($archiveTimestamp.Second % 2))
-$minimumZipTimestamp = [System.DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [System.TimeSpan]::Zero)
-$maximumZipTimestamp = [System.DateTimeOffset]::new(2107, 12, 31, 23, 59, 58, [System.TimeSpan]::Zero)
-if ($archiveTimestamp -lt $minimumZipTimestamp -or $archiveTimestamp -gt $maximumZipTimestamp) {
-    throw "The HEAD commit timestamp '$archiveTimestamp' is outside the ZIP timestamp range."
-}
-
 [xml] $buildProps = Get-Content -LiteralPath $buildPropsPath -Raw
 $projectVersion = @($buildProps.Project.PropertyGroup | Where-Object { $_.Version } | ForEach-Object { [string] $_.Version })[0]
 if ([string]::IsNullOrWhiteSpace($projectVersion)) {
@@ -77,6 +55,60 @@ if ([string]::IsNullOrWhiteSpace($projectVersion)) {
 
 $releaseVersion = $projectVersion
 $tag = "v$releaseVersion"
+$null = & git -C $repositoryRoot rev-parse --verify --quiet "refs/tags/$tag^{commit}"
+$tagLookupExitCode = $LASTEXITCODE
+$archiveRevision = 'HEAD'
+$archiveRevisionLabel = 'HEAD'
+if ($tagLookupExitCode -eq 0) {
+    $archiveRevision = $tag
+    $archiveRevisionLabel = $tag
+}
+elseif ($tagLookupExitCode -ne 1) {
+    throw "Unable to check whether local release tag '$tag' exists."
+}
+
+if ($Publish -and $tagLookupExitCode -eq 1) {
+    $remoteTagLines = @(& git -C $repositoryRoot ls-remote --exit-code --tags origin "refs/tags/$tag" "refs/tags/$tag^{}")
+    $remoteTagExitCode = $LASTEXITCODE
+    if ($remoteTagExitCode -eq 0) {
+        $remoteTagLine = $remoteTagLines | Where-Object { $_ -match '\^\{\}$' } | Select-Object -First 1
+        if ([string]::IsNullOrWhiteSpace($remoteTagLine)) {
+            $remoteTagLine = $remoteTagLines[0]
+        }
+        $remoteTagCommit = @($remoteTagLine -split '\s+')[0]
+        if ($remoteTagCommit -notmatch '^[0-9a-fA-F]{40,64}$') {
+            throw "Remote release tag '$tag' resolved to an invalid Git object '$remoteTagCommit'."
+        }
+        $archiveRevision = $remoteTagCommit
+        $archiveRevisionLabel = $tag
+    }
+    elseif ($remoteTagExitCode -ne 2) {
+        throw "Unable to check whether remote release tag '$tag' exists."
+    }
+}
+
+$commitTimestampText = & git -C $repositoryRoot show -s --format=%ct $archiveRevision
+if ($LASTEXITCODE -ne 0) {
+    throw "Unable to read the $archiveRevisionLabel commit timestamp used for reproducible ZIP metadata."
+}
+$commitTimestampText = ([string] $commitTimestampText).Trim()
+$commitTimestampSeconds = [long] 0
+if (-not [long]::TryParse(
+        $commitTimestampText,
+        [System.Globalization.NumberStyles]::None,
+        [System.Globalization.CultureInfo]::InvariantCulture,
+        [ref] $commitTimestampSeconds)) {
+    throw "Git returned an invalid $archiveRevisionLabel commit timestamp '$commitTimestampText'."
+}
+$archiveTimestamp = [System.DateTimeOffset]::FromUnixTimeSeconds($commitTimestampSeconds).ToUniversalTime()
+# ZIP stores seconds at two-second precision; normalize once so repeated builds have identical metadata.
+$archiveTimestamp = $archiveTimestamp.AddSeconds(-($archiveTimestamp.Second % 2))
+$minimumZipTimestamp = [System.DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [System.TimeSpan]::Zero)
+$maximumZipTimestamp = [System.DateTimeOffset]::new(2107, 12, 31, 23, 59, 58, [System.TimeSpan]::Zero)
+if ($archiveTimestamp -lt $minimumZipTimestamp -or $archiveTimestamp -gt $maximumZipTimestamp) {
+    throw "The $archiveRevisionLabel commit timestamp '$archiveTimestamp' is outside the ZIP timestamp range."
+}
+
 if ($Publish -and -not [string]::IsNullOrWhiteSpace($env:GITHUB_REF_NAME) -and $env:GITHUB_REF_NAME -ne $tag) {
     throw "The workflow tag '$($env:GITHUB_REF_NAME)' does not match the project release tag '$tag'."
 }
@@ -336,7 +368,7 @@ function Invoke-ReleasePackaging {
     New-Item -ItemType Directory -Path $stagingDirectory -Force | Out-Null
 
     Write-Information "Packaging Symlink Creator $releaseVersion for x64 and ARM64..." -InformationAction Continue
-    Write-Information "Using Git HEAD timestamp $($archiveTimestamp.ToString('u')) for reproducible ZIP entries." -InformationAction Continue
+    Write-Information "Using Git $archiveRevisionLabel timestamp $($archiveTimestamp.ToString('u')) for reproducible ZIP entries." -InformationAction Continue
     $validationPlatform = if ($null -eq $hostPlatform) { 'x64' } else { $hostPlatform }
     Write-Information "Validating source and running tests for the host-compatible $validationPlatform target..." -InformationAction Continue
     & $buildScriptPath -TargetPlatform $validationPlatform -Configuration Release -Verify | Out-Host
