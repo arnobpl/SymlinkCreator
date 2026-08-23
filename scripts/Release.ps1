@@ -514,11 +514,43 @@ function Invoke-GitHubReleaseTagReplacement {
         '-f', "sha=$Commit",
         '-F', 'force=true'
     )
-    Invoke-CheckedCommand -FilePath 'git' -ArgumentList @(
-        '-C', $repositoryRoot,
-        'tag', '--force', $tag, $Commit
-    )
     Write-Information "GitHub release tag $tag now points to $Commit." -InformationAction Continue
+}
+
+function Invoke-WinGetForkSync {
+    $ownerResponse = @(& gh api user --jq '.login' 2>&1)
+    $ownerResponseText = ($ownerResponse | ForEach-Object ToString) -join "`n"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to identify the GitHub CLI user before synchronizing the WinGet fork: $ownerResponseText"
+    }
+    $forkOwner = $ownerResponseText.Trim()
+    if ($forkOwner -notmatch '^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$') {
+        throw "GitHub CLI returned an invalid account name '$forkOwner'."
+    }
+
+    $forkRepository = "$forkOwner/winget-pkgs"
+    $forkResponse = @(& gh api "repos/$forkRepository" --jq `
+            '{isFork: .fork, parent: .parent.full_name, upstreamBranch: .parent.default_branch}' 2>&1)
+    $forkResponseText = ($forkResponse | ForEach-Object ToString) -join "`n"
+    if ($LASTEXITCODE -ne 0) {
+        if ($forkResponseText -match '(?i)HTTP 404|"status"\s*:\s*"?404"?') {
+            Write-Information "No $forkRepository fork exists yet; WingetCreate will create it during submission." -InformationAction Continue
+            return
+        }
+        throw "Unable to inspect the WinGet fork '$forkRepository': $forkResponseText"
+    }
+
+    $fork = $forkResponseText | ConvertFrom-Json
+    if (-not $fork.isFork -or $fork.parent -ne 'microsoft/winget-pkgs') {
+        throw "GitHub repository '$forkRepository' is not a fork of microsoft/winget-pkgs."
+    }
+
+    Write-Information "Synchronizing $forkRepository with microsoft/winget-pkgs..." -InformationAction Continue
+    Invoke-CheckedCommand -FilePath 'gh' -ArgumentList @(
+        'repo', 'sync', $forkRepository,
+        '--source', 'microsoft/winget-pkgs',
+        '--branch', $fork.upstreamBranch
+    )
 }
 
 function Assert-GitHubReleaseAsset {
@@ -652,6 +684,7 @@ function Publish-Release {
     foreach ($package in $Release.Packages) {
         Assert-GitHubReleaseAsset -GitHubRelease $githubRelease -Package $package
     }
+    Invoke-WinGetForkSync
     Write-Information 'Submitting the WinGet manifest PR (using WingetCreate cached OAuth or WINGET_CREATE_GITHUB_TOKEN)...' -InformationAction Continue
     Invoke-CheckedCommand -FilePath $WinGetCreate -ArgumentList @(
         'submit',
