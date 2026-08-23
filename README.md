@@ -89,7 +89,7 @@ You can append these startup options to a Windows shortcut's target to configure
 - `--retain-script` keeps the generated `.cmd` file on the Desktop after symlink creation. The file contains the Windows commands used by Symlink Creator and can be reviewed for troubleshooting or advanced use.
 - `--hide-success-dialog` skips the confirmation dialog after symlink creation succeeds. Error and canceled-operation dialogs are still shown.
 
-For a WinGet installation, first find the executable path in PowerShell:
+For a WinGet installation, first find the command alias path in PowerShell:
 
 ```powershell
 where.exe symlinkcreator
@@ -98,7 +98,7 @@ where.exe symlinkcreator
 Copy the path that this command returns into the shortcut target, followed by the desired options. For example:
 
 ```text
-"C:\Users\<username>\AppData\Local\Microsoft\WinGet\Packages\ArnobPaul.SymlinkCreator_Microsoft.Winget.Source_8wekyb3d8bbwe\SymlinkCreator.exe" --language zh-CN --absolute-paths --retain-script --hide-success-dialog
+"C:\Users\<username>\AppData\Local\Microsoft\WinGet\Links\symlinkcreator.exe" --language zh-CN --absolute-paths --retain-script --hide-success-dialog
 ```
 
 The three preference options apply only to that launch and can still be changed using the checkboxes. Language selection and elevation-warning suppression are startup-only options.

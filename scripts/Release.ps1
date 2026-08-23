@@ -46,7 +46,8 @@ if ($null -ne $resolvedReleaseNotesPath -and
 $repositoryRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $buildPropsPath = Join-Path $repositoryRoot 'Directory.Build.props'
 $buildScriptPath = Join-Path $repositoryRoot 'scripts\Build.ps1'
-$projectPath = Join-Path $repositoryRoot 'SymlinkCreator.UI\SymlinkCreator.UI.csproj'
+$applicationProjectPath = Join-Path $repositoryRoot 'SymlinkCreator.UI\SymlinkCreator.UI.csproj'
+$launcherProjectPath = Join-Path $repositoryRoot 'SymlinkCreator.Launcher\SymlinkCreator.Launcher.csproj'
 $wingetTemplateDirectory = Join-Path $repositoryRoot 'scripts\winget'
 # APPINSTALLER_CLI_ERROR_MANIFEST_VALIDATION_WARNING
 $wingetManifestValidationWarning = [int32]0x8A150028
@@ -265,9 +266,10 @@ function Invoke-ArchitecturePackaging {
     param([Parameter(Mandatory)] [pscustomobject] $Target)
 
     $publishDirectory = Join-Path $stagingDirectory "publish\$($Target.WinGetArchitecture)"
+    $launcherPublishDirectory = Join-Path $stagingDirectory "launcher\$($Target.WinGetArchitecture)"
     $zipPath = Join-Path $stagingDirectory $Target.AssetName
     Write-Information "Publishing the $($Target.Platform) framework-dependent application..." -InformationAction Continue
-    & dotnet publish $projectPath `
+    & dotnet publish $applicationProjectPath `
         --configuration Release `
         --runtime $Target.RuntimeIdentifier `
         -p:Platform=$($Target.Platform) `
@@ -275,6 +277,21 @@ function Invoke-ArchitecturePackaging {
     if ($LASTEXITCODE -ne 0) {
         throw "dotnet publish for $($Target.Platform) failed with exit code $LASTEXITCODE."
     }
+
+    Write-Information "Publishing the $($Target.Platform) command launcher..." -InformationAction Continue
+    & dotnet publish $launcherProjectPath `
+        --configuration Release `
+        --runtime $Target.RuntimeIdentifier `
+        -p:Platform=$($Target.Platform) `
+        --output $launcherPublishDirectory | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet publish for the $($Target.Platform) command launcher failed with exit code $LASTEXITCODE."
+    }
+    $launcherPath = Join-Path $launcherPublishDirectory 'SymlinkCreator.Launcher.exe'
+    if (-not (Test-Path -LiteralPath $launcherPath -PathType Leaf)) {
+        throw "The $($Target.Platform) command launcher was not published."
+    }
+    Copy-Item -LiteralPath $launcherPath -Destination $publishDirectory
 
     $publishEntries = @(Get-ChildItem -LiteralPath $publishDirectory -File -Recurse -Force | Sort-Object FullName)
     if ($publishEntries.Count -eq 0) {
@@ -285,7 +302,7 @@ function Invoke-ArchitecturePackaging {
         ForEach-Object { [System.IO.Path]::GetRelativePath($publishDirectory, $_.FullName).Replace('\', '/') } |
         Sort-Object
     )
-    foreach ($requiredName in @('SymlinkCreator.exe', 'resources.pri')) {
+    foreach ($requiredName in @('SymlinkCreator.exe', 'SymlinkCreator.Launcher.exe', 'resources.pri')) {
         $requiredPath = Join-Path $publishDirectory $requiredName
         if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf) -or
             (Get-Item -LiteralPath $requiredPath).Length -le 0) {
@@ -390,16 +407,20 @@ function Test-ArchivePackage {
 
         $escapedVersion = [regex]::Escape($releaseVersion)
         $executablePath = Join-Path $extractRoot 'SymlinkCreator.exe'
-        $fileVersion = (Get-Item -LiteralPath $executablePath).VersionInfo.FileVersion
-        if ($fileVersion -notmatch "^$escapedVersion(?:\.0)?$") {
-            throw "$($Package.Platform) EXE FileVersion '$fileVersion' does not match project version '$releaseVersion'."
+        $launcherPath = Join-Path $extractRoot 'SymlinkCreator.Launcher.exe'
+        foreach ($versionedExecutable in @($executablePath, $launcherPath)) {
+            $fileVersion = (Get-Item -LiteralPath $versionedExecutable).VersionInfo.FileVersion
+            if ($fileVersion -notmatch "^$escapedVersion(?:\.0)?$") {
+                $executableName = Split-Path -Leaf $versionedExecutable
+                throw "$($Package.Platform) $executableName FileVersion '$fileVersion' does not match project version '$releaseVersion'."
+            }
         }
 
-        Write-Information "$($Package.Platform) release ZIP and EXE version verified." -InformationAction Continue
+        Write-Information "$($Package.Platform) release ZIP and executable versions verified." -InformationAction Continue
         if ($shouldLaunch) {
             Write-Information "Fresh $($Package.Platform) extraction retained for manual testing: $extractRoot" -InformationAction Continue
-            Start-Process -FilePath $executablePath -WorkingDirectory $extractRoot | Out-Null
-            Write-Information "Launched the host-compatible $($Package.Platform) release." -InformationAction Continue
+            Start-Process -FilePath $launcherPath -WorkingDirectory $extractRoot | Out-Null
+            Write-Information "Launched the host-compatible $($Package.Platform) release through its command launcher." -InformationAction Continue
         }
     }
     finally {
@@ -420,6 +441,10 @@ function Test-ReleaseBundle {
     $installerManifest = Get-Content -LiteralPath $Release.InstallerManifestPath -Raw
     if ($installerManifest -notmatch "(?m)^PackageVersion: $escapedVersion\r?$") {
         throw "WinGet PackageVersion does not match project version '$releaseVersion'."
+    }
+    if ($installerManifest -notmatch '(?m)^- RelativeFilePath: SymlinkCreator\.Launcher\.exe\r?$' -or
+        $installerManifest -notmatch '(?m)^  PortableCommandAlias: symlinkcreator\r?$') {
+        throw 'WinGet must map the symlinkcreator alias through SymlinkCreator.Launcher.exe.'
     }
     foreach ($package in $Release.Packages) {
         if ($installerManifest -notmatch [regex]::Escape($package.InstallerUrl) -or

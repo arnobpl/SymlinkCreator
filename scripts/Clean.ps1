@@ -12,6 +12,8 @@ $generatedDirectories = @(
     'SymlinkCreator.UI\obj',
     'SymlinkCreator.Application\bin',
     'SymlinkCreator.Application\obj',
+    'SymlinkCreator.Launcher\bin',
+    'SymlinkCreator.Launcher\obj',
     'SymlinkCreator.Tests\bin',
     'SymlinkCreator.Tests\obj',
     'SymlinkCreator.Tests\TestResults',

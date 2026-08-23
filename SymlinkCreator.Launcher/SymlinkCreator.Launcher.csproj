@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>SymlinkCreator.Launcher</RootNamespace>
+    <AssemblyName>SymlinkCreator.Launcher</AssemblyName>
+    <Product>SymlinkCreator</Product>
+    <AssemblyTitle>Symlink Creator command launcher</AssemblyTitle>
+    <Description>Command launcher for the portable Symlink Creator application</Description>
+    <Company>Arnob Paul</Company>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifier Condition="'$(Platform)' == 'x64'">win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <Target Name="ValidatePlatform" BeforeTargets="PrepareForBuild">
+    <Error
+      Condition="'$(RuntimeIdentifier)' == ''"
+      Text="Unsupported platform '$(Platform)'. Supported platforms are x64 and ARM64." />
+  </Target>
+</Project>

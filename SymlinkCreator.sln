@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymlinkCreator.Tests", "Sym
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymlinkCreator.Application", "SymlinkCreator.Application\SymlinkCreator.Application.csproj", "{58B2033B-45FF-4F02-9FE7-56DE5EAB4965}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymlinkCreator.Launcher", "SymlinkCreator.Launcher\SymlinkCreator.Launcher.csproj", "{9E5C7DA1-3C6D-4A7C-A86A-1BBAB451E4D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -40,6 +42,14 @@ Global
 		{58B2033B-45FF-4F02-9FE7-56DE5EAB4965}.Release|ARM64.Build.0 = Release|Any CPU
 		{58B2033B-45FF-4F02-9FE7-56DE5EAB4965}.Release|x64.ActiveCfg = Release|Any CPU
 		{58B2033B-45FF-4F02-9FE7-56DE5EAB4965}.Release|x64.Build.0 = Release|Any CPU
+		{9E5C7DA1-3C6D-4A7C-A86A-1BBAB451E4D2}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{9E5C7DA1-3C6D-4A7C-A86A-1BBAB451E4D2}.Debug|ARM64.Build.0 = Debug|ARM64
+		{9E5C7DA1-3C6D-4A7C-A86A-1BBAB451E4D2}.Debug|x64.ActiveCfg = Debug|x64
+		{9E5C7DA1-3C6D-4A7C-A86A-1BBAB451E4D2}.Debug|x64.Build.0 = Debug|x64
+		{9E5C7DA1-3C6D-4A7C-A86A-1BBAB451E4D2}.Release|ARM64.ActiveCfg = Release|ARM64
+		{9E5C7DA1-3C6D-4A7C-A86A-1BBAB451E4D2}.Release|ARM64.Build.0 = Release|ARM64
+		{9E5C7DA1-3C6D-4A7C-A86A-1BBAB451E4D2}.Release|x64.ActiveCfg = Release|x64
+		{9E5C7DA1-3C6D-4A7C-A86A-1BBAB451E4D2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

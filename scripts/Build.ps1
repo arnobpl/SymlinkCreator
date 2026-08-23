@@ -106,7 +106,7 @@ try {
     }
 
     Write-Information 'Restoring projects...' -InformationAction Continue
-    & dotnet restore .\SymlinkCreator.Tests\SymlinkCreator.Tests.csproj `
+    & dotnet restore .\SymlinkCreator.sln `
         -p:Configuration=$Configuration `
         -p:Platform=$TargetPlatform
     if ($LASTEXITCODE -ne 0) {
@@ -114,12 +114,12 @@ try {
     }
 
     Write-Information 'Building and linting projects...' -InformationAction Continue
-    & dotnet build .\SymlinkCreator.Tests\SymlinkCreator.Tests.csproj `
+    & dotnet build .\SymlinkCreator.sln `
         --configuration $Configuration `
         --no-restore `
         -p:Platform=$TargetPlatform
     if ($LASTEXITCODE -ne 0) {
-        throw "dotnet build for tests failed with exit code $LASTEXITCODE."
+        throw "dotnet build failed with exit code $LASTEXITCODE."
     }
 
     Write-Information 'Verifying C# style...' -InformationAction Continue
