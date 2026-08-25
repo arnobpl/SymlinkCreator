@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["mklink", "NTFS", "symlinkcreator", "winget", "wingetcreate"]
+  "cSpell.words": [
+    "mklink",
+    "MSTEST",
+    "NTFS",
+    "symlinkcreator",
+    "winget",
+    "wingetcreate"
+  ]
 }

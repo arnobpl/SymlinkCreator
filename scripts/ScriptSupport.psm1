@@ -28,8 +28,8 @@ function Get-ProjectVersion {
     [xml] $buildProps = Get-Content -LiteralPath $BuildPropsPath -Raw
     $projectVersion = @(
         $buildProps.Project.PropertyGroup |
-        Where-Object { $_.Version } |
-        ForEach-Object { [string] $_.Version }
+            Where-Object { $_.Version } |
+            ForEach-Object { [string] $_.Version }
     )[0]
     if ([string]::IsNullOrWhiteSpace($projectVersion)) {
         throw "The project version could not be read from '$BuildPropsPath'."

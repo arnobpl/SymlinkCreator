@@ -30,6 +30,12 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Install PowerShell analyzer
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+
       - name: Validate and package release
         shell: pwsh
         run: .\scripts\Release.ps1 -SkipWinGetValidation

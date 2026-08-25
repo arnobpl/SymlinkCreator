@@ -166,8 +166,8 @@ function Write-WinGetManifestSet {
         [Parameter(Mandatory)] [object[]] $Packages
     )
 
-    $x64Package = @($Packages | Where-Object Platform -eq 'x64')
-    $arm64Package = @($Packages | Where-Object Platform -eq 'ARM64')
+    $x64Package = @($Packages | Where-Object Platform -EQ 'x64')
+    $arm64Package = @($Packages | Where-Object Platform -EQ 'ARM64')
     if ($x64Package.Count -ne 1 -or $arm64Package.Count -ne 1) {
         throw 'WinGet manifest generation requires exactly one x64 package and one ARM64 package.'
     }
@@ -266,8 +266,8 @@ function Invoke-ArchitecturePackaging {
     }
     $archiveNames = @(
         $publishEntries |
-        ForEach-Object { [System.IO.Path]::GetRelativePath($publishDirectory, $_.FullName).Replace('\', '/') } |
-        Sort-Object
+            ForEach-Object { [System.IO.Path]::GetRelativePath($publishDirectory, $_.FullName).Replace('\', '/') } |
+            Sort-Object
     )
     foreach ($requiredName in @('SymlinkCreator.exe', 'SymlinkCreator.Launcher.exe', 'resources.pri')) {
         $requiredPath = Join-Path $publishDirectory $requiredName
@@ -359,8 +359,8 @@ function Test-ArchivePackage {
         $entries = @(Get-ChildItem -LiteralPath $extractRoot -File -Recurse -Force)
         $actualNames = @(
             $entries |
-            ForEach-Object { [System.IO.Path]::GetRelativePath($extractRoot, $_.FullName).Replace('\', '/') } |
-            Sort-Object
+                ForEach-Object { [System.IO.Path]::GetRelativePath($extractRoot, $_.FullName).Replace('\', '/') } |
+                Sort-Object
         )
         $expectedNames = @($Package.ArchiveNames | Sort-Object)
         if (($actualNames -join "`n") -ne ($expectedNames -join "`n")) {
@@ -543,7 +543,7 @@ function Assert-GitHubReleaseAsset {
     if ($GitHubRelease.tagName -ne $tag) {
         throw "GitHub release verification returned tag '$($GitHubRelease.tagName)' instead of '$tag'."
     }
-    $asset = @($GitHubRelease.assets | Where-Object name -eq $Package.AssetName)
+    $asset = @($GitHubRelease.assets | Where-Object name -EQ $Package.AssetName)
     if ($asset.Count -ne 1) {
         throw "GitHub release verification did not find exactly one $($Package.AssetName) asset."
     }
@@ -628,7 +628,7 @@ function Publish-Release {
             Write-Information "GitHub release $tag already exists; verifying it so publication can resume safely." -InformationAction Continue
             $packagesToUpload = @($Release.Packages | Where-Object {
                     $assetName = $_.AssetName
-                    @($githubRelease.assets | Where-Object name -eq $assetName).Count -eq 0
+                    @($githubRelease.assets | Where-Object name -EQ $assetName).Count -eq 0
                 })
         }
 

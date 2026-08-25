@@ -342,17 +342,17 @@ public sealed partial class MainWindow : Window
     private void ApplyLocalizedStrings()
     {
         SourceListHeader.Text = StringResources.GetString("SourceListHeader.Text");
-        AddFilesButton.Content = StringResources.GetString("AddFilesButton.Content");
-        AddFoldersButton.Content = StringResources.GetString("AddFoldersButton.Content");
-        RemoveSelectedButton.Content = StringResources.GetString("RemoveSelectedButton.Content");
-        ClearListButton.Content = StringResources.GetString("ClearListButton.Content");
+        AddFilesButton.Text = StringResources.GetString("AddFilesButton.Content");
+        AddFoldersButton.Text = StringResources.GetString("AddFoldersButton.Content");
+        RemoveSelectedButton.Text = StringResources.GetString("RemoveSelectedButton.Content");
+        ClearListButton.Text = StringResources.GetString("ClearListButton.Content");
         DestinationPathHeader.Text = StringResources.GetString("DestinationPathHeader.Text");
-        BrowseButton.Content = StringResources.GetString("BrowseButton.Content");
+        BrowseButton.Text = StringResources.GetString("BrowseButton.Content");
         RelativePathCheckBox.Content = StringResources.GetString("RelativePathCheckBox.Content");
         RetainScriptCheckBox.Content = StringResources.GetString("RetainScriptCheckBox.Content");
         HideSuccessCheckBox.Content = StringResources.GetString("HideSuccessCheckBox.Content");
-        CreateSymlinksButtonLabel.Text = StringResources.GetString("CreateSymlinksButtonLabel.Text");
-        AboutButton.Content = StringResources.GetString("AboutButton.Content");
+        CreateSymlinksButton.Text = StringResources.GetString("CreateSymlinksButtonLabel.Text");
+        AboutButton.Text = StringResources.GetString("AboutButton.Content");
     }
 
     private FileOpenPicker CreateFilePicker()

@@ -11,6 +11,13 @@ winget install --id Microsoft.PowerShell --exact --source winget
 winget install --id Microsoft.DotNet.SDK.10 --exact --source winget
 ```
 
+Install the PowerShell analyzer used by local verification:
+
+```powershell
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+```
+
 Optionally enable the repository's local Git hooks:
 
 ```powershell
@@ -25,6 +32,12 @@ Build the Release configuration for the current architecture:
 
 ```powershell
 .\scripts\Build.ps1
+```
+
+Apply available PowerShell and C# formatting fixes:
+
+```powershell
+.\scripts\Build.ps1 -Fix
 ```
 
 Run the full repository verification gate: formatting and style checks, script analysis, restore, build, and host-compatible tests:
