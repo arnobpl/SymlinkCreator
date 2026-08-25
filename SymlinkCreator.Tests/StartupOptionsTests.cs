@@ -29,6 +29,26 @@ public sealed class StartupOptionsTests
     }
 
     [TestMethod]
+    public void ParseCommandLineArgumentsRecognizesProcessArguments()
+    {
+        var options = StartupOptions.ParseCommandLineArguments(
+        [
+            "--no-elevation-warning",
+            "--absolute-paths",
+            "--retain-script",
+            "--hide-success-dialog",
+            "--language",
+            "bn-BD"
+        ]);
+
+        Assert.IsTrue(options.SuppressElevationWarning);
+        Assert.IsFalse(options.UseRelativePath);
+        Assert.IsTrue(options.RetainScriptFile);
+        Assert.IsTrue(options.HideSuccessfulOperationDialog);
+        Assert.AreEqual("bn-BD", options.Language);
+    }
+
+    [TestMethod]
     public void ParseIsCaseInsensitiveAndIgnoresUnknownArguments()
     {
         var options = StartupOptions.Parse(

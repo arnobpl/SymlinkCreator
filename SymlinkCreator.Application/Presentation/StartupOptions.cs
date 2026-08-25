@@ -23,55 +23,66 @@ public sealed record StartupOptions(
 
     public static StartupOptions Parse(string? arguments)
     {
+        return ParseTokens(
+            string.IsNullOrWhiteSpace(arguments)
+                ? []
+                : arguments.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries));
+    }
+
+    public static StartupOptions ParseCommandLineArguments(IEnumerable<string> arguments)
+    {
+        ArgumentNullException.ThrowIfNull(arguments);
+        return ParseTokens(arguments);
+    }
+
+    private static StartupOptions ParseTokens(IEnumerable<string> tokens)
+    {
         bool suppressElevationWarning = false;
         bool useRelativePath = true;
         bool retainScriptFile = false;
         bool hideSuccessfulOperationDialog = false;
         string? language = null;
 
-        if (!string.IsNullOrWhiteSpace(arguments))
+        string[] arguments = [.. tokens];
+        for (int index = 0; index < arguments.Length; index++)
         {
-            string[] tokens = arguments.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
-            for (int index = 0; index < tokens.Length; index++)
+            string argument = arguments[index];
+            string normalizedArgument = argument.ToLowerInvariant();
+
+            if (normalizedArgument.StartsWith("--language=", StringComparison.Ordinal))
             {
-                string argument = tokens[index];
-                string normalizedArgument = argument.ToLowerInvariant();
+                language = NormalizeLanguage(argument["--language=".Length..]);
+                continue;
+            }
 
-                if (normalizedArgument.StartsWith("--language=", StringComparison.Ordinal))
+            if (normalizedArgument == "--language")
+            {
+                if (
+                    index + 1 < arguments.Length &&
+                    !arguments[index + 1].StartsWith("--", StringComparison.Ordinal))
                 {
-                    language = NormalizeLanguage(argument["--language=".Length..]);
-                    continue;
+                    language = NormalizeLanguage(arguments[++index]);
                 }
 
-                if (normalizedArgument == "--language")
-                {
-                    if (
-                        index + 1 < tokens.Length &&
-                        !tokens[index + 1].StartsWith("--", StringComparison.Ordinal))
-                    {
-                        language = NormalizeLanguage(tokens[++index]);
-                    }
+                continue;
+            }
 
-                    continue;
-                }
-
-                switch (normalizedArgument)
-                {
-                    case "--no-elevation-warning":
-                        suppressElevationWarning = true;
-                        break;
-                    case "--absolute-paths":
-                        useRelativePath = false;
-                        break;
-                    case "--retain-script":
-                        retainScriptFile = true;
-                        break;
-                    case "--hide-success-dialog":
-                        hideSuccessfulOperationDialog = true;
-                        break;
-                    default:
-                        break;
-                }
+            switch (normalizedArgument)
+            {
+                case "--no-elevation-warning":
+                    suppressElevationWarning = true;
+                    break;
+                case "--absolute-paths":
+                    useRelativePath = false;
+                    break;
+                case "--retain-script":
+                    retainScriptFile = true;
+                    break;
+                case "--hide-success-dialog":
+                    hideSuccessfulOperationDialog = true;
+                    break;
+                default:
+                    break;
             }
         }
 

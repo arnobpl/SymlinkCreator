@@ -6,7 +6,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WindowsTargetFramework>net10.0-windows10.0.26100.0</WindowsTargetFramework>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>

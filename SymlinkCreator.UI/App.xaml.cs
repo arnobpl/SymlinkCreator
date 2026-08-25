@@ -39,7 +39,9 @@ public partial class App : Microsoft.UI.Xaml.Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var startupOptions = StartupOptions.Parse(args.Arguments);
+        _ = args;
+        var startupOptions = StartupOptions.ParseCommandLineArguments(
+            Environment.GetCommandLineArgs().Skip(1));
         _resources.SetLanguage(startupOptions.Language);
         _mainWindowViewModel.ApplyStartupOptions(startupOptions);
         _window = new MainWindow(
