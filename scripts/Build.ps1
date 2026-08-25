@@ -187,8 +187,7 @@ try {
             --no-build `
             --no-restore `
             -p:Platform=$TargetPlatform `
-            --blame-hang `
-            --blame-hang-timeout 2m `
+            --settings .\SymlinkCreator.Tests.runsettings `
             --logger 'console;verbosity=normal'
         if ($LASTEXITCODE -ne 0) {
             throw "dotnet test failed with exit code $LASTEXITCODE."
