@@ -31,6 +31,8 @@ symlinkcreator
 
 🗂️ [View all releases](https://github.com/arnobpl/SymlinkCreator/releases)
 
+#### Manual ZIP prerequisites
+
 Before running the framework-dependent ZIP, install its prerequisites:
 
 ```powershell

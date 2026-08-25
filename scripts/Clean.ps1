@@ -19,6 +19,7 @@ $generatedDirectories = @(
     'SymlinkCreator.Tests\TestResults',
     'artifacts'
 )
+$removedDirectoryCount = 0
 
 foreach ($relativePath in $generatedDirectories) {
     $directoryPath = Join-Path $repositoryRoot $relativePath
@@ -26,12 +27,17 @@ foreach ($relativePath in $generatedDirectories) {
         $PSCmdlet.ShouldProcess($directoryPath, 'Remove generated directory')) {
         Write-Information "Removing $directoryPath" -InformationAction Continue
         Remove-Item -LiteralPath $directoryPath -Recurse -Force
+        $removedDirectoryCount++
     }
 }
 
 if ($WhatIfPreference) {
     Write-Information 'Cleanup preview complete; nothing was removed.' -InformationAction Continue
 }
+elseif ($removedDirectoryCount -eq 0) {
+    Write-Information 'No generated directories were removed.' -InformationAction Continue
+}
 else {
-    Write-Information 'Generated project outputs and release artifacts cleaned.' -InformationAction Continue
+    $directoryLabel = if ($removedDirectoryCount -eq 1) { 'directory' } else { 'directories' }
+    Write-Information "Removed $removedDirectoryCount generated $directoryLabel." -InformationAction Continue
 }

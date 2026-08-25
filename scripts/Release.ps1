@@ -2,10 +2,6 @@
 
 [CmdletBinding(SupportsShouldProcess)]
 param(
-    [string] $OutputDirectory,
-    [ValidatePattern('^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$')]
-    [string] $Repository = 'arnobpl/SymlinkCreator',
-    [string] $WinGetCreatePath,
     [string] $ReleaseNotesPath,
     [switch] $LaunchForManualTest,
     [switch] $SkipWinGetValidation,
@@ -44,21 +40,17 @@ if ($null -ne $resolvedReleaseNotesPath -and
 }
 
 $repositoryRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$repositoryName = 'arnobpl/SymlinkCreator'
 $buildPropsPath = Join-Path $repositoryRoot 'Directory.Build.props'
+$scriptSupportModulePath = Join-Path $PSScriptRoot 'ScriptSupport.psm1'
 $buildScriptPath = Join-Path $repositoryRoot 'scripts\Build.ps1'
 $applicationProjectPath = Join-Path $repositoryRoot 'SymlinkCreator.UI\SymlinkCreator.UI.csproj'
 $launcherProjectPath = Join-Path $repositoryRoot 'SymlinkCreator.Launcher\SymlinkCreator.Launcher.csproj'
 $wingetTemplateDirectory = Join-Path $repositoryRoot 'scripts\winget'
-# APPINSTALLER_CLI_ERROR_MANIFEST_VALIDATION_WARNING
-$wingetManifestValidationWarning = [int32]0x8A150028
 
-[xml] $buildProps = Get-Content -LiteralPath $buildPropsPath -Raw
-$projectVersion = @($buildProps.Project.PropertyGroup | Where-Object { $_.Version } | ForEach-Object { [string] $_.Version })[0]
-if ([string]::IsNullOrWhiteSpace($projectVersion)) {
-    throw "The project version could not be read from '$buildPropsPath'."
-}
+Import-Module -Name $scriptSupportModulePath -Force
 
-$releaseVersion = $projectVersion
+$releaseVersion = Get-ProjectVersion -BuildPropsPath $buildPropsPath
 $tag = "v$releaseVersion"
 $headMetadata = @(& git -C $repositoryRoot show -s '--format=%H%n%ct' HEAD)
 if ($LASTEXITCODE -ne 0 -or $headMetadata.Count -ne 2) {
@@ -90,21 +82,7 @@ if ($Publish -and -not [string]::IsNullOrWhiteSpace($env:GITHUB_REF_NAME) -and $
     throw "The workflow tag '$($env:GITHUB_REF_NAME)' does not match the project release tag '$tag'."
 }
 
-$defaultOutputDirectory = if ($LaunchForManualTest) {
-    Join-Path $repositoryRoot 'artifacts\local-release'
-}
-else {
-    Join-Path $repositoryRoot 'artifacts'
-}
-$outputDirectoryPath = if ([string]::IsNullOrWhiteSpace($OutputDirectory)) {
-    $defaultOutputDirectory
-}
-elseif ([System.IO.Path]::IsPathRooted($OutputDirectory)) {
-    [System.IO.Path]::GetFullPath($OutputDirectory)
-}
-else {
-    [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $OutputDirectory))
-}
+$outputDirectoryPath = Join-Path $repositoryRoot 'artifacts'
 
 $stagingDirectory = Join-Path $outputDirectoryPath ".release-staging-$([guid]::NewGuid().ToString('N'))"
 $manifestDirectory = Join-Path $stagingDirectory "winget\$releaseVersion"
@@ -124,11 +102,7 @@ $releaseTargets = @(
         AssetName          = 'Symlink.Creator.arm64.zip'
     }
 )
-$hostPlatform = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
-    ([System.Runtime.InteropServices.Architecture]::X64) { 'x64'; break }
-    ([System.Runtime.InteropServices.Architecture]::Arm64) { 'ARM64'; break }
-    default { $null }
-}
+$hostPlatform = Get-HostPlatform
 if ($LaunchForManualTest -and $null -eq $hostPlatform) {
     throw "Release launch testing is unsupported on '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)'."
 }
@@ -177,18 +151,11 @@ function Read-WinGetTemplate {
 }
 
 function Resolve-WinGetCreate {
-    param([string] $ExecutablePath)
-
-    $wingetCreate = if ([string]::IsNullOrWhiteSpace($ExecutablePath)) {
-        $command = Get-Command wingetcreate -ErrorAction SilentlyContinue
-        if ($null -eq $command) { $null } else { $command.Source }
-    }
-    else {
-        [System.IO.Path]::GetFullPath($ExecutablePath)
-    }
+    $command = Get-Command wingetcreate -ErrorAction SilentlyContinue
+    $wingetCreate = if ($null -eq $command) { $null } else { $command.Source }
 
     if ([string]::IsNullOrWhiteSpace($wingetCreate) -or -not (Test-Path -LiteralPath $wingetCreate -PathType Leaf)) {
-        throw 'wingetcreate was not found. Install it or pass -WinGetCreatePath.'
+        throw 'wingetcreate was not found on PATH. Install it and retry.'
     }
     return $wingetCreate
 }
@@ -352,7 +319,7 @@ function Invoke-ArchitecturePackaging {
         ZipLength          = (Get-Item -LiteralPath $zipPath).Length
         ZipSha256          = $zipHash
         ArchiveNames       = $archiveNames
-        InstallerUrl       = "https://github.com/$Repository/releases/download/$tag/$($Target.AssetName)"
+        InstallerUrl       = "https://github.com/$repositoryName/releases/download/$tag/$($Target.AssetName)"
     }
 }
 
@@ -457,18 +424,7 @@ function Test-ReleaseBundle {
         Write-Information 'Skipping WinGet CLI validation because it was explicitly disabled.' -InformationAction Continue
     }
     else {
-        if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-            throw 'winget is required to validate the generated local manifest.'
-        }
-        & winget validate --manifest $Release.ManifestDirectory
-        $validationExitCode = $LASTEXITCODE
-        if ($validationExitCode -eq $wingetManifestValidationWarning) {
-            Write-Information 'WinGet manifest validation succeeded with warnings.' -InformationAction Continue
-        }
-        elseif ($validationExitCode -ne 0) {
-            throw "WinGet manifest validation failed with exit code $validationExitCode."
-        }
-        $global:LASTEXITCODE = 0
+        Invoke-WinGetManifestValidation -ManifestDirectory $Release.ManifestDirectory
     }
 
     foreach ($package in $Release.Packages) {
@@ -501,7 +457,7 @@ function Complete-ReleaseBundle {
 function Get-GitHubRelease {
     param([Parameter(Mandatory)] [string] $ReleaseTag)
 
-    $response = @(& gh api "repos/$Repository/releases/tags/$ReleaseTag" --jq `
+    $response = @(& gh api "repos/$repositoryName/releases/tags/$ReleaseTag" --jq `
             '{tagName: .tag_name, assets: [.assets[] | {name, size, url: .browser_download_url}]}' 2>&1)
     $responseText = ($response | ForEach-Object ToString) -join "`n"
     if ($LASTEXITCODE -eq 0) {
@@ -514,7 +470,7 @@ function Get-GitHubRelease {
 }
 
 function Get-GitHubTagCommit {
-    $response = @(& gh api "repos/$Repository/commits/$tag" --jq '.sha' 2>&1)
+    $response = @(& gh api "repos/$repositoryName/commits/$tag" --jq '.sha' 2>&1)
     $responseText = ($response | ForEach-Object ToString) -join "`n"
     if ($LASTEXITCODE -eq 0) {
         $commit = $responseText.Trim()
@@ -535,7 +491,7 @@ function Invoke-GitHubReleaseTagReplacement {
     Invoke-CheckedCommand -FilePath 'gh' -ArgumentList @(
         'api',
         '--method', 'PATCH',
-        "repos/$Repository/git/refs/tags/$tag",
+        "repos/$repositoryName/git/refs/tags/$tag",
         '-f', "sha=$Commit",
         '-F', 'force=true'
     )
@@ -600,7 +556,7 @@ function Assert-GitHubReleaseAsset {
     try {
         Invoke-CheckedCommand -FilePath 'gh' -ArgumentList @(
             'release', 'download', $tag,
-            '--repo', $Repository,
+            '--repo', $repositoryName,
             '--pattern', $Package.AssetName,
             '--dir', $verificationDirectory
         )
@@ -651,7 +607,7 @@ function Publish-Release {
         $createArguments = @('release', 'create', $tag)
         $createArguments += @($Release.Packages | ForEach-Object ZipPath)
         $createArguments += @(
-            '--repo', $Repository,
+            '--repo', $repositoryName,
             '--target', $headCommit,
             '--title', "Symlink Creator $releaseVersion"
         )
@@ -680,7 +636,7 @@ function Publish-Release {
             Write-Information "Uploading $($package.AssetName)..." -InformationAction Continue
             $uploadArguments = @(
                 'release', 'upload', $tag, $package.ZipPath,
-                '--repo', $Repository
+                '--repo', $repositoryName
             )
             if ($ReplaceExistingRelease) {
                 $uploadArguments += '--clobber'
@@ -691,7 +647,7 @@ function Publish-Release {
         if (-not [string]::IsNullOrWhiteSpace($NotesPath)) {
             Invoke-CheckedCommand -FilePath 'gh' -ArgumentList @(
                 'release', 'edit', $tag,
-                '--repo', $Repository,
+                '--repo', $repositoryName,
                 '--notes-file', $NotesPath
             )
             Write-Information "GitHub release notes updated from '$NotesPath'." -InformationAction Continue
@@ -728,7 +684,7 @@ try {
         if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
             throw 'GitHub CLI (gh) is required to create the GitHub release.'
         }
-        $wingetCreate = Resolve-WinGetCreate -ExecutablePath $WinGetCreatePath
+        $wingetCreate = Resolve-WinGetCreate
     }
 
     $release = Invoke-ReleasePackaging
@@ -737,7 +693,7 @@ try {
 
     if ($Publish) {
         if ($PSCmdlet.ShouldProcess(
-                "$Repository and microsoft/winget-pkgs",
+                "$repositoryName and microsoft/winget-pkgs",
                 "publish GitHub release $tag and submit its WinGet manifest")) {
             Publish-Release -Release $release -WinGetCreate $wingetCreate -NotesPath $resolvedReleaseNotesPath
         }

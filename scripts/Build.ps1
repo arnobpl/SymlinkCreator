@@ -11,11 +11,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$hostPlatform = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
-    ([System.Runtime.InteropServices.Architecture]::Arm64) { 'ARM64'; break }
-    ([System.Runtime.InteropServices.Architecture]::X64) { 'x64'; break }
-    default { $null }
-}
+$scriptSupportModulePath = Join-Path $PSScriptRoot 'ScriptSupport.psm1'
+Import-Module -Name $scriptSupportModulePath -Force
+$hostPlatform = Get-HostPlatform
 
 if ([string]::IsNullOrWhiteSpace($TargetPlatform)) {
     if ($null -eq $hostPlatform) {
