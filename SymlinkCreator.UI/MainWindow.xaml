@@ -10,22 +10,20 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid
+        <StackPanel
             x:Name="AppTitleBar"
             Grid.Row="0"
             Height="32"
-            Padding="16,0">
-            <StackPanel
+            Padding="16,0"
+            Orientation="Horizontal"
+            Spacing="8">
+            <Image
+                Width="16"
+                Height="16"
                 VerticalAlignment="Center"
-                Orientation="Horizontal"
-                Spacing="8">
-                <Image
-                    Width="16"
-                    Height="16"
-                    Source="Assets/MainIcon.ico" />
-                <TextBlock x:Name="AppTitleBarText" VerticalAlignment="Center" />
-            </StackPanel>
-        </Grid>
+                Source="Assets/MainIcon.ico" />
+            <TextBlock x:Name="AppTitleBarText" VerticalAlignment="Center" />
+        </StackPanel>
 
         <Grid
             x:Name="MainContent"
@@ -74,7 +72,6 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" Spacing="8">
@@ -147,10 +144,18 @@
                     <CheckBox x:Name="HideSuccessCheckBox" IsChecked="{x:Bind ViewModel.HideSuccessfulOperationDialog, Mode=TwoWay}" />
                 </StackPanel>
 
-                <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                    <controls:WrappedButton x:Name="AboutButton" />
+                <Grid Grid.Row="5" ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <controls:WrappedButton
+                        x:Name="AboutButton"
+                        Grid.Column="0"
+                        HorizontalAlignment="Left" />
                     <controls:WrappedButton
                         x:Name="CreateSymlinksButton"
+                        Grid.Column="1"
                         IsEnabled="{x:Bind ViewModel.CanCreateSymlinks, Mode=OneWay}">
                         <controls:WrappedButton.LeadingContent>
                             <PathIcon
@@ -161,7 +166,7 @@
                                 Foreground="{ThemeResource SystemControlHighlightAltAccentBrush}" />
                         </controls:WrappedButton.LeadingContent>
                     </controls:WrappedButton>
-                </StackPanel>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
