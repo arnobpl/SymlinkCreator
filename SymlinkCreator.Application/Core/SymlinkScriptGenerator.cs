@@ -24,7 +24,11 @@ public sealed class SymlinkScriptGenerator : ISymlinkScriptGenerator
         _ = script.AppendLine("@echo off");
         _ = script.AppendLine("setlocal DisableDelayedExpansion");
         _ = script.AppendLine("chcp 65001 >NUL");
-        _ = script.Append("cd /d ").AppendLine(Quote(plan.DestinationDirectory));
+        _ = script
+            .Append("cd /d ")
+            .Append(Quote(plan.DestinationDirectory))
+            .AppendLine();
+        _ = script.AppendLine("if errorlevel 1 exit /b %errorlevel%");
 
         foreach (SymlinkEntry entry in plan.Entries)
         {
@@ -46,15 +50,10 @@ public sealed class SymlinkScriptGenerator : ISymlinkScriptGenerator
 
     private static string Quote(string value)
     {
-        if (value.Contains('"') || value.Contains('\r') || value.Contains('\n'))
-        {
-            throw new SymlinkValidationException(
+        return BatchScriptSyntax.TryQuote(value, out string quotedValue)
+            ? quotedValue
+            : throw new SymlinkValidationException(
                 SymlinkValidationError.GeneratedPathContainsInvalidCharacters,
                 "A generated script path contains invalid characters.");
-        }
-
-        // Percent signs are expanded in batch files even when surrounded by quotes.
-        // Doubling them preserves a literal percent sign for the command being run.
-        return $"\"{value.Replace("%", "%%", StringComparison.Ordinal)}\"";
     }
 }

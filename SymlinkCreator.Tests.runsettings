@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <RunSettings>
   <MSTest>
-    <TestTimeout>120000</TestTimeout>
+    <!-- Shared per-test timeout and cooperative-cancellation policy for the suite. -->
+    <TestTimeout>15000</TestTimeout>
+    <UseCooperativeCancellation>true</UseCooperativeCancellation>
   </MSTest>
 </RunSettings>

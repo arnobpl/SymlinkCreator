@@ -27,10 +27,12 @@ public sealed class SymlinkScriptGeneratorTests
         string script = new SymlinkScriptGenerator().Generate(plan);
 
         Assert.Contains("setlocal DisableDelayedExpansion", script);
-        Assert.Contains("cd /d \"C:\\Destination Folder\"", script);
+        Assert.Contains(
+            "cd /d \"C:\\Destination Folder\"\r\nif errorlevel 1 exit /b %errorlevel%",
+            script);
         Assert.Contains("mklink \"file.txt\" \"..\\Source Folder\\file.txt\"", script);
         Assert.Contains("mklink /d \"folder\" \"..\\Source Folder\\folder\"", script);
-        Assert.AreEqual(2, CountOccurrences(script, "if errorlevel 1 exit /b %errorlevel%"));
+        Assert.AreEqual(3, CountOccurrences(script, "if errorlevel 1 exit /b %errorlevel%"));
     }
 
     [TestMethod]

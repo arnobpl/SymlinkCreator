@@ -5,6 +5,7 @@ using Microsoft.Windows.Storage.Pickers;
 using SymlinkCreator.Application.Core;
 using SymlinkCreator.Application.Platform;
 using SymlinkCreator.Application.Presentation;
+using System.ComponentModel;
 using System.Globalization;
 using System.Security.Principal;
 using Windows.ApplicationModel.DataTransfer;
@@ -13,9 +14,14 @@ using Windows.Storage;
 
 namespace SymlinkCreator;
 
-public sealed partial class MainWindow : Window
+public sealed partial class MainWindow : Window, IDisposable
 {
+    // The window owns the operation lifetime so closing it cancels work that could otherwise
+    // finish after the UI has gone away.
+    private readonly CancellationTokenSource _operationCancellation = new();
     private readonly bool _suppressElevationWarning;
+    private bool _isClosed;
+    private bool _operationCancellationDisposed;
     private string? _previouslySelectedDestinationFolderPath;
 
     public MainWindow(
@@ -40,9 +46,12 @@ public sealed partial class MainWindow : Window
         DestinationPathTextBox.DragOver += DroppedPaths_DragOver;
         BrowseButton.Click += BrowseButton_Click;
         CreateSymlinksButton.Click += CreateSymlinksButton_Click;
+        ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+        Closed += MainWindow_Closed;
         AboutButton.Click += AboutButton_Click;
         ApplyLocalizedStrings();
         ApplyToolTips();
+        UpdateCreateSymlinksIndicator();
         MainContent.Loaded += MainContent_Loaded;
     }
 
@@ -277,21 +286,72 @@ public sealed partial class MainWindow : Window
         _ = sender;
         _ = e;
 
-        if (ViewModel.TryCreateSymlinks())
+        if (_isClosed)
         {
-            if (!ViewModel.HideSuccessfulOperationDialog)
-            {
-                await ShowMessageAsync(
-                    StringResources.GetString("SuccessDialog.Title"),
-                    ViewModel.SuccessMessage ?? StringResources.GetString("ExecutionCompleted"));
-            }
-
             return;
         }
 
-        await ShowMessageAsync(
-            StringResources.GetString("ErrorDialog.Title"),
-            ViewModel.ErrorMessage ?? StringResources.GetString("ExecutionFailed"));
+        try
+        {
+            bool succeeded = await ViewModel.TryCreateSymlinksAsync(_operationCancellation.Token);
+            // Cancellation and the awaited operation can race with Closed; never show a dialog
+            // against a window that has already been disposed.
+            if (_isClosed)
+            {
+                return;
+            }
+
+            if (succeeded)
+            {
+                if (!ViewModel.HideSuccessfulOperationDialog)
+                {
+                    await ShowMessageAsync(
+                        StringResources.GetString("SuccessDialog.Title"),
+                        ViewModel.SuccessMessage ?? StringResources.GetString("ExecutionCompleted"));
+                }
+
+                return;
+            }
+
+            await ShowMessageAsync(
+                StringResources.GetString("ErrorDialog.Title"),
+                ViewModel.ErrorMessage ?? StringResources.GetString("ExecutionFailed"));
+        }
+        finally
+        {
+            DisposeOperationCancellationIfIdle();
+        }
+    }
+
+    private void MainWindow_Closed(object sender, WindowEventArgs e)
+    {
+        _ = sender;
+        _ = e;
+        Dispose();
+    }
+
+    public void Dispose()
+    {
+        if (_isClosed)
+        {
+            return;
+        }
+
+        _isClosed = true;
+        ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+        _operationCancellation.Cancel();
+        DisposeOperationCancellationIfIdle();
+    }
+
+    private void DisposeOperationCancellationIfIdle()
+    {
+        // Signal cancellation first, then wait for the operation's finally block before
+        // disposing the source so downstream token users cannot race with Dispose().
+        if (_isClosed && !ViewModel.IsCreatingSymlinks && !_operationCancellationDisposed)
+        {
+            _operationCancellationDisposed = true;
+            _operationCancellation.Dispose();
+        }
     }
 
     private async void AboutButton_Click(object sender, RoutedEventArgs e)
@@ -319,6 +379,23 @@ public sealed partial class MainWindow : Window
         });
 
         await ShowDialogAsync(StringResources.GetString("AboutTitle"), content);
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainWindowViewModel.IsCreatingSymlinks))
+        {
+            UpdateCreateSymlinksIndicator();
+        }
+    }
+
+    private void UpdateCreateSymlinksIndicator()
+    {
+        bool isCreating = ViewModel.IsCreatingSymlinks;
+        CreateSymlinksShieldIcon.Visibility = isCreating
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+        CreateSymlinksBusyIndicator.IsActive = isCreating;
     }
 
     private void ApplyToolTips()
@@ -395,7 +472,7 @@ public sealed partial class MainWindow : Window
             XamlRoot = WindowRoot.XamlRoot
         };
 
-        _ = await dialog.ShowAsync();
+        await dialog.ShowAsync();
     }
 
     private Task ShowFormattedErrorAsync(string formatResourceKey, Exception exception)

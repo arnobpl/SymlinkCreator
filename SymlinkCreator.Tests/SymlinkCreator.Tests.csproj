@@ -9,6 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <MSTestAnalysisMode>Recommended</MSTestAnalysisMode>
     <Nullable>enable</Nullable>
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)\..\SymlinkCreator.Tests.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 
   <ItemGroup>

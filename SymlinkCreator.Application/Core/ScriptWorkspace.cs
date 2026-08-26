@@ -28,12 +28,22 @@ public sealed class ScriptWorkspace(
         return Path.Combine(RootDirectory, $"{ApplicationMetadata.FileName}_{Guid.NewGuid():N}{suffix}");
     }
 
-    public void WriteScript(string path, string content)
+    public async Task WriteScriptAsync(
+        string path,
+        string content,
+        CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(content);
+        cancellationToken.ThrowIfCancellationRequested();
         _ = Directory.CreateDirectory(RootDirectory);
-        File.WriteAllText(path, content, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        // Generated batch files select code page 65001 themselves, so keep them BOM-free
+        // to avoid prefixing the first command with an encoding marker.
+        await File.WriteAllTextAsync(
+            path,
+            content,
+            new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+            cancellationToken);
     }
 
     public static void DeleteIfExists(string path)

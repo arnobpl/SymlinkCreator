@@ -4,7 +4,7 @@ namespace SymlinkCreator.Tests;
 public sealed class SymlinkOperationServiceTests
 {
     [TestMethod]
-    public void ExecuteDeletesGeneratedScriptWhenRetentionIsDisabled()
+    public async Task ExecuteDeletesGeneratedScriptWhenRetentionIsDisabled()
     {
         using var temporary = TemporaryDirectory.Create();
         string sourcePath = temporary.CreateFile("source.txt");
@@ -12,10 +12,11 @@ public sealed class SymlinkOperationServiceTests
         var runner = new FakeProcessRunner(new ProcessExecutionResult(0, string.Empty));
         SymlinkOperationService service = CreateService(temporary, runner);
 
-        SymlinkOperationResult result = service.Execute(new SymlinkRequest(
+        SymlinkOperationResult result = await service.ExecuteAsync(new SymlinkRequest(
             new[] { sourcePath },
             destinationDirectory,
-            RetainScriptFile: false));
+            RetainScriptFile: false),
+            CancellationToken.None);
 
         Assert.IsNull(result.RetainedScriptPath);
         Assert.HasCount(1, runner.Paths);
@@ -24,7 +25,7 @@ public sealed class SymlinkOperationServiceTests
     }
 
     [TestMethod]
-    public void ExecuteRetainsGeneratedScriptWhenRequested()
+    public async Task ExecuteRetainsGeneratedScriptWhenRequested()
     {
         using var temporary = TemporaryDirectory.Create();
         string sourcePath = temporary.CreateFile("source.txt");
@@ -32,10 +33,11 @@ public sealed class SymlinkOperationServiceTests
         var runner = new FakeProcessRunner(new ProcessExecutionResult(0, string.Empty));
         SymlinkOperationService service = CreateService(temporary, runner);
 
-        SymlinkOperationResult result = service.Execute(new SymlinkRequest(
+        SymlinkOperationResult result = await service.ExecuteAsync(new SymlinkRequest(
             new[] { sourcePath },
             destinationDirectory,
-            RetainScriptFile: true));
+            RetainScriptFile: true),
+            CancellationToken.None);
 
         Assert.AreEqual(runner.Paths.Single(), result.RetainedScriptPath);
         Assert.IsTrue(File.Exists(result.RetainedScriptPath));
@@ -44,7 +46,24 @@ public sealed class SymlinkOperationServiceTests
     }
 
     [TestMethod]
-    public void ExecuteMapsCancellationAndCleansUpNonRetainedScript()
+    public async Task ExecuteForwardsCancellationTokenToProcessRunner()
+    {
+        using var temporary = TemporaryDirectory.Create();
+        string sourcePath = temporary.CreateFile("source.txt");
+        string destinationDirectory = temporary.CreateDirectory("destination");
+        var runner = new FakeProcessRunner(new ProcessExecutionResult(0, string.Empty));
+        SymlinkOperationService service = CreateService(temporary, runner);
+        using var cancellation = new CancellationTokenSource();
+
+        await service.ExecuteAsync(
+            new SymlinkRequest(new[] { sourcePath }, destinationDirectory),
+            cancellation.Token);
+
+        Assert.AreEqual(cancellation.Token, runner.LastCancellationToken);
+    }
+
+    [TestMethod]
+    public async Task ExecuteMapsCancellationAndCleansUpNonRetainedScript()
     {
         using var temporary = TemporaryDirectory.Create();
         string sourcePath = temporary.CreateFile("source.txt");
@@ -52,8 +71,10 @@ public sealed class SymlinkOperationServiceTests
         var runner = new FakeProcessRunner(new ProcessExecutionResult(-1, "cancelled", WasCancelled: true));
         SymlinkOperationService service = CreateService(temporary, runner);
 
-        SymlinkExecutionException exception = Assert.ThrowsExactly<SymlinkExecutionException>(() =>
-            service.Execute(new SymlinkRequest(new[] { sourcePath }, destinationDirectory)));
+        SymlinkExecutionException exception = await Assert.ThrowsExactlyAsync<SymlinkExecutionException>(() =>
+            service.ExecuteAsync(
+                new SymlinkRequest(new[] { sourcePath }, destinationDirectory),
+                CancellationToken.None));
 
         Assert.IsTrue(exception.WasCancelled);
         Assert.Contains("canceled", exception.Message);
@@ -61,7 +82,7 @@ public sealed class SymlinkOperationServiceTests
     }
 
     [TestMethod]
-    public void ExecuteMapsNonZeroExitAndIncludesStandardError()
+    public async Task ExecuteMapsNonZeroExitAndIncludesStandardError()
     {
         using var temporary = TemporaryDirectory.Create();
         string sourcePath = temporary.CreateFile("source.txt");
@@ -69,8 +90,10 @@ public sealed class SymlinkOperationServiceTests
         var runner = new FakeProcessRunner(new ProcessExecutionResult(7, "target already exists"));
         SymlinkOperationService service = CreateService(temporary, runner);
 
-        SymlinkExecutionException exception = Assert.ThrowsExactly<SymlinkExecutionException>(() =>
-            service.Execute(new SymlinkRequest(new[] { sourcePath }, destinationDirectory)));
+        SymlinkExecutionException exception = await Assert.ThrowsExactlyAsync<SymlinkExecutionException>(() =>
+            service.ExecuteAsync(
+                new SymlinkRequest(new[] { sourcePath }, destinationDirectory),
+                CancellationToken.None));
 
         Assert.AreEqual(7, exception.ExitCode);
         Assert.Contains("target already exists", exception.Message);
@@ -99,11 +122,16 @@ public sealed class SymlinkOperationServiceTests
 
         public List<string> Scripts { get; } = [];
 
-        public ProcessExecutionResult Run(string scriptPath)
+        public CancellationToken LastCancellationToken { get; private set; }
+
+        public Task<ProcessExecutionResult> RunAsync(
+            string scriptPath,
+            CancellationToken cancellationToken)
         {
+            LastCancellationToken = cancellationToken;
             Paths.Add(scriptPath);
             Scripts.Add(File.ReadAllText(scriptPath));
-            return _result;
+            return Task.FromResult(_result);
         }
     }
 }

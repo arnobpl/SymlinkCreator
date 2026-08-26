@@ -81,19 +81,15 @@
 
                     <Grid
                         Grid.Column="1"
-                        HorizontalAlignment="Right"
                         MaxWidth="320"
+                        HorizontalAlignment="Right"
                         ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <controls:WrappedButton
-                            x:Name="RemoveSelectedButton"
-                            Grid.Column="0" />
-                        <controls:WrappedButton
-                            x:Name="ClearListButton"
-                            Grid.Column="1" />
+                        <controls:WrappedButton x:Name="RemoveSelectedButton" Grid.Column="0" />
+                        <controls:WrappedButton x:Name="ClearListButton" Grid.Column="1" />
                     </Grid>
                 </Grid>
             </Grid>
@@ -128,9 +124,7 @@
                         Grid.Column="0"
                         AllowDrop="True"
                         Text="{x:Bind ViewModel.DestinationPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <controls:WrappedButton
-                        x:Name="BrowseButton"
-                        Grid.Column="1" />
+                    <controls:WrappedButton x:Name="BrowseButton" Grid.Column="1" />
                 </Grid>
 
                 <Border
@@ -158,12 +152,18 @@
                         Grid.Column="1"
                         IsEnabled="{x:Bind ViewModel.CanCreateSymlinks, Mode=OneWay}">
                         <controls:WrappedButton.LeadingContent>
-                            <PathIcon
-                                Width="24"
-                                Height="24"
-                                AutomationProperties.AccessibilityView="Raw"
-                                Data="M12,1 L21,5 V11 C21,16 17,20 12,23 C7,20 3,16 3,11 V5 Z"
-                                Foreground="{ThemeResource SystemControlHighlightAltAccentBrush}" />
+                            <Grid Width="24" Height="24">
+                                <PathIcon
+                                    x:Name="CreateSymlinksShieldIcon"
+                                    Width="24"
+                                    Height="24"
+                                    AutomationProperties.AccessibilityView="Raw"
+                                    Data="M12,1 L21,5 V11 C21,16 17,20 12,23 C7,20 3,16 3,11 V5 Z"
+                                    Foreground="{ThemeResource SystemControlHighlightAltAccentBrush}" />
+                                <controls:BusyIndicator
+                                    x:Name="CreateSymlinksBusyIndicator"
+                                    Stroke="{ThemeResource SystemControlHighlightAltAccentBrush}" />
+                            </Grid>
                         </controls:WrappedButton.LeadingContent>
                     </controls:WrappedButton>
                 </Grid>

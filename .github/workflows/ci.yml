@@ -38,4 +38,6 @@ jobs:
 
       - name: Validate and package release
         shell: pwsh
+        env:
+          SYMLINKCREATOR_RUN_ELEVATED_TESTS: 'true'
         run: .\scripts\Release.ps1 -SkipWinGetValidation

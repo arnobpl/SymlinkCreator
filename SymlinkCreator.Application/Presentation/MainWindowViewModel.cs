@@ -42,6 +42,12 @@ public sealed class MainWindowViewModel(
         set => SetProperty(ref field, value);
     }
 
+    public bool IsCreatingSymlinks
+    {
+        get;
+        private set => SetProperty(ref field, value);
+    }
+
     public string? ErrorMessage
     {
         get;
@@ -54,7 +60,10 @@ public sealed class MainWindowViewModel(
         private set => SetProperty(ref field, value);
     }
 
-    public bool CanCreateSymlinks => SourcePaths.Count > 0 && !string.IsNullOrWhiteSpace(DestinationPath);
+    public bool CanCreateSymlinks =>
+        !IsCreatingSymlinks &&
+        SourcePaths.Count > 0 &&
+        !string.IsNullOrWhiteSpace(DestinationPath);
 
     public void ApplyStartupOptions(StartupOptions options)
     {
@@ -100,8 +109,13 @@ public sealed class MainWindowViewModel(
         DestinationPath = PathInput.Sanitize(path);
     }
 
-    public bool TryCreateSymlinks()
+    public async Task<bool> TryCreateSymlinksAsync(CancellationToken cancellationToken = default)
     {
+        if (IsCreatingSymlinks)
+        {
+            return false;
+        }
+
         ErrorMessage = null;
         SuccessMessage = null;
 
@@ -117,13 +131,15 @@ public sealed class MainWindowViewModel(
             return false;
         }
 
+        IsCreatingSymlinks = true;
         try
         {
-            _ = _operationService.Execute(new SymlinkRequest(
+            await _operationService.ExecuteAsync(new SymlinkRequest(
                 [.. SourcePaths],
                 DestinationPath,
                 UseRelativePath,
-                RetainScriptFile));
+                RetainScriptFile),
+                cancellationToken);
             SuccessMessage = HideSuccessfulOperationDialog
                 ? null
                 : _resources.GetString("ExecutionCompleted");
@@ -134,6 +150,11 @@ public sealed class MainWindowViewModel(
             ErrorMessage = exception.WasCancelled
                 ? _resources.GetString("ElevationCanceled")
                 : $"{_resources.GetString("ExecutionFailed")}\n{exception.Message}";
+            return false;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            ErrorMessage = _resources.GetString("ElevationCanceled");
             return false;
         }
         catch (SymlinkValidationException exception)
@@ -149,6 +170,10 @@ public sealed class MainWindowViewModel(
                 _resources.GetString("UnexpectedExecutionErrorFormat"),
                 exception.Message);
             return false;
+        }
+        finally
+        {
+            IsCreatingSymlinks = false;
         }
     }
 
@@ -196,7 +221,7 @@ public sealed class MainWindowViewModel(
 
         storage = value;
         OnPropertyChanged(propertyName);
-        if (propertyName is nameof(DestinationPath))
+        if (propertyName is nameof(DestinationPath) or nameof(IsCreatingSymlinks))
         {
             OnPropertyChanged(nameof(CanCreateSymlinks));
         }

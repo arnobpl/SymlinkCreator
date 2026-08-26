@@ -16,20 +16,30 @@ public sealed class SymlinkOperationService(
     private readonly ScriptWorkspace _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
     private readonly IPrivilegedProcessRunner _processRunner = processRunner ?? throw new ArgumentNullException(nameof(processRunner));
 
-    public SymlinkOperationResult Execute(SymlinkRequest request)
+    public async Task<SymlinkOperationResult> ExecuteAsync(
+        SymlinkRequest request,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+        cancellationToken.ThrowIfCancellationRequested();
 
         SymlinkPlan plan = _planner.CreatePlan(
             request.SourcePaths,
             request.DestinationDirectory,
             request.UseRelativePath);
+        // Planning and generation are synchronous; observe cancellation between those phases
+        // before creating or running the generated script.
+        cancellationToken.ThrowIfCancellationRequested();
         string scriptPath = _workspace.CreateScriptPath(request.RetainScriptFile);
 
         try
         {
-            _workspace.WriteScript(scriptPath, _scriptGenerator.Generate(plan));
-            ProcessExecutionResult processResult = _processRunner.Run(scriptPath);
+            string script = _scriptGenerator.Generate(plan);
+            cancellationToken.ThrowIfCancellationRequested();
+            await _workspace.WriteScriptAsync(scriptPath, script, cancellationToken);
+            ProcessExecutionResult processResult = await _processRunner.RunAsync(
+                scriptPath,
+                cancellationToken);
 
             return processResult.ExitCode != 0
                 ? throw new SymlinkExecutionException(
@@ -54,7 +64,7 @@ public sealed class SymlinkOperationService(
     {
         if (result.WasCancelled)
         {
-            return "The elevation request was canceled.";
+            return ProcessExecutionResult.CancellationMessage;
         }
 
         string detail = result.StandardError.Trim();

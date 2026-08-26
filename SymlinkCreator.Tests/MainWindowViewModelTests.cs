@@ -1,7 +1,7 @@
 namespace SymlinkCreator.Tests;
 
 [TestClass]
-public sealed class MainWindowViewModelTests
+public sealed class MainWindowViewModelTests(TestContext testContext)
 {
     private static readonly string[] SingleSourcePath = ["source.txt"];
 
@@ -15,6 +15,7 @@ public sealed class MainWindowViewModelTests
         Assert.IsTrue(viewModel.UseRelativePath);
         Assert.IsFalse(viewModel.RetainScriptFile);
         Assert.IsFalse(viewModel.HideSuccessfulOperationDialog);
+        Assert.IsFalse(viewModel.IsCreatingSymlinks);
         Assert.IsFalse(viewModel.CanCreateSymlinks);
     }
 
@@ -57,22 +58,22 @@ public sealed class MainWindowViewModelTests
     }
 
     [TestMethod]
-    public void TryCreateSymlinksReportsMissingSourcesAndDestinationWithoutExecuting()
+    public async Task TryCreateSymlinksReportsMissingSourcesAndDestinationWithoutExecuting()
     {
         MainWindowViewModel viewModel = CreateViewModel(out FakeOperationService operationService);
 
-        Assert.IsFalse(viewModel.TryCreateSymlinks());
+        Assert.IsFalse(await viewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
         Assert.AreEqual("No files or folders were selected.", viewModel.ErrorMessage);
         Assert.IsEmpty(operationService.Requests);
 
         viewModel.AddSourcePaths(SingleSourcePath);
-        Assert.IsFalse(viewModel.TryCreateSymlinks());
+        Assert.IsFalse(await viewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
         Assert.AreEqual("Destination path is empty.", viewModel.ErrorMessage);
         Assert.IsEmpty(operationService.Requests);
     }
 
     [TestMethod]
-    public void TryCreateSymlinksOrchestratesOperationAndMapsSuccess()
+    public async Task TryCreateSymlinksOrchestratesOperationAndMapsSuccess()
     {
         MainWindowViewModel viewModel = CreateViewModel(out FakeOperationService operationService);
         viewModel.AddSourcePaths(SingleSourcePath);
@@ -80,7 +81,7 @@ public sealed class MainWindowViewModelTests
         viewModel.UseRelativePath = false;
         viewModel.RetainScriptFile = true;
 
-        Assert.IsTrue(viewModel.TryCreateSymlinks());
+        Assert.IsTrue(await viewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
         SymlinkRequest request = operationService.Requests.Single();
         Assert.AreSequenceEqual(SingleSourcePath, request.SourcePaths.ToArray());
         Assert.AreEqual("destination", request.DestinationDirectory);
@@ -91,19 +92,42 @@ public sealed class MainWindowViewModelTests
     }
 
     [TestMethod]
-    public void TryCreateSymlinksHideSuccessOptionSuppressesSuccessMessage()
+    public async Task TryCreateSymlinksPreventsConcurrentOperations()
+    {
+        MainWindowViewModel viewModel = CreateViewModel(out FakeOperationService operationService);
+        operationService.Gate = new TaskCompletionSource<bool>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        viewModel.AddSourcePaths(SingleSourcePath);
+        viewModel.DestinationPath = "destination";
+
+        Task<bool> operation = viewModel.TryCreateSymlinksAsync(testContext.CancellationToken);
+        await operationService.Started.Task.WaitAsync(testContext.CancellationToken);
+
+        Assert.IsTrue(viewModel.IsCreatingSymlinks);
+        Assert.IsFalse(viewModel.CanCreateSymlinks);
+        Assert.IsFalse(await viewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
+        Assert.HasCount(1, operationService.Requests);
+
+        operationService.Gate.SetResult(true);
+        Assert.IsTrue(await operation);
+        Assert.IsFalse(viewModel.IsCreatingSymlinks);
+        Assert.IsTrue(viewModel.CanCreateSymlinks);
+    }
+
+    [TestMethod]
+    public async Task TryCreateSymlinksHideSuccessOptionSuppressesSuccessMessage()
     {
         MainWindowViewModel viewModel = CreateViewModel(out _);
         viewModel.AddSourcePaths(SingleSourcePath);
         viewModel.DestinationPath = "destination";
         viewModel.HideSuccessfulOperationDialog = true;
 
-        Assert.IsTrue(viewModel.TryCreateSymlinks());
+        Assert.IsTrue(await viewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
         Assert.IsNull(viewModel.SuccessMessage);
     }
 
     [TestMethod]
-    public void TryCreateSymlinksMapsCancellationAndFailureMessages()
+    public async Task TryCreateSymlinksMapsCancellationAndFailureMessages()
     {
         MainWindowViewModel canceledViewModel = CreateViewModel(
             out _,
@@ -111,7 +135,7 @@ public sealed class MainWindowViewModelTests
         canceledViewModel.AddSourcePaths(SingleSourcePath);
         canceledViewModel.DestinationPath = "destination";
 
-        Assert.IsFalse(canceledViewModel.TryCreateSymlinks());
+        Assert.IsFalse(await canceledViewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
         Assert.AreEqual("The elevation request was canceled.", canceledViewModel.ErrorMessage);
 
         MainWindowViewModel failedViewModel = CreateViewModel(
@@ -120,11 +144,26 @@ public sealed class MainWindowViewModelTests
         failedViewModel.AddSourcePaths(SingleSourcePath);
         failedViewModel.DestinationPath = "destination";
 
-        Assert.IsFalse(failedViewModel.TryCreateSymlinks());
+        Assert.IsFalse(await failedViewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
         string? errorMessage = failedViewModel.ErrorMessage;
         Assert.IsNotNull(errorMessage);
         Assert.Contains("Symlink creation failed.", errorMessage);
         Assert.Contains("target already exists", errorMessage);
+    }
+
+    [TestMethod]
+    public async Task TryCreateSymlinksMapsCanceledOperationToken()
+    {
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        MainWindowViewModel viewModel = CreateViewModel(
+            out _,
+            new OperationCanceledException(cancellation.Token));
+        viewModel.AddSourcePaths(SingleSourcePath);
+        viewModel.DestinationPath = "destination";
+
+        Assert.IsFalse(await viewModel.TryCreateSymlinksAsync(cancellation.Token));
+        Assert.AreEqual("The elevation request was canceled.", viewModel.ErrorMessage);
     }
 
     [TestMethod]
@@ -142,7 +181,7 @@ public sealed class MainWindowViewModelTests
     [DataRow(SymlinkValidationError.InvalidLinkName, "The source path cannot be used as a link name: C:\\", "C:\\")]
     [DataRow(SymlinkValidationError.EmptyPlan, "The symlink plan contains no entries.", null)]
     [DataRow(SymlinkValidationError.GeneratedPathContainsInvalidCharacters, "A generated script path contains invalid characters.", null)]
-    public void TryCreateSymlinksLocalizesValidationErrors(
+    public async Task TryCreateSymlinksLocalizesValidationErrors(
         SymlinkValidationError error,
         string expectedMessage,
         string? messageArgument)
@@ -156,12 +195,12 @@ public sealed class MainWindowViewModelTests
         viewModel.AddSourcePaths(SingleSourcePath);
         viewModel.DestinationPath = "destination";
 
-        Assert.IsFalse(viewModel.TryCreateSymlinks());
+        Assert.IsFalse(await viewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
         Assert.AreEqual(expectedMessage, viewModel.ErrorMessage);
     }
 
     [TestMethod]
-    public void TryCreateSymlinksReportsExpectedSystemFailures()
+    public async Task TryCreateSymlinksReportsExpectedSystemFailures()
     {
         MainWindowViewModel viewModel = CreateViewModel(
             out _,
@@ -169,7 +208,7 @@ public sealed class MainWindowViewModelTests
         viewModel.AddSourcePaths(SingleSourcePath);
         viewModel.DestinationPath = "destination";
 
-        Assert.IsFalse(viewModel.TryCreateSymlinks());
+        Assert.IsFalse(await viewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
         Assert.AreEqual(
             "Symlink creation could not be started. The script directory is unavailable.",
             viewModel.ErrorMessage);
@@ -219,9 +258,22 @@ public sealed class MainWindowViewModelTests
 
         public List<SymlinkRequest> Requests { get; } = [];
 
-        public SymlinkOperationResult Execute(SymlinkRequest request)
+        public TaskCompletionSource<bool> Started { get; } = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public TaskCompletionSource<bool>? Gate { get; set; }
+
+        public async Task<SymlinkOperationResult> ExecuteAsync(
+            SymlinkRequest request,
+            CancellationToken cancellationToken)
         {
             Requests.Add(request);
+            Started.TrySetResult(true);
+            if (Gate is not null)
+            {
+                await Gate.Task.WaitAsync(cancellationToken);
+            }
+
             return _exception is not null
                 ? throw _exception
                 : new SymlinkOperationResult(
