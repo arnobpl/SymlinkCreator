@@ -37,8 +37,8 @@ public sealed class ScriptWorkspace(
         ArgumentNullException.ThrowIfNull(content);
         cancellationToken.ThrowIfCancellationRequested();
         _ = Directory.CreateDirectory(RootDirectory);
-        // Generated batch files select code page 65001 themselves, so keep them BOM-free
-        // to avoid prefixing the first command with an encoding marker.
+        // Generated batch files select code page 65001 themselves, so write them without a
+        // UTF-8 BOM; otherwise cmd.exe can treat the marker as part of the first command.
         await File.WriteAllTextAsync(
             path,
             content,

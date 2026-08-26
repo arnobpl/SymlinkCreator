@@ -8,14 +8,14 @@ public sealed class ProcessExecutionTests(TestContext testContext)
     {
         using var temporary = TemporaryDirectory.Create();
         string scriptPath = temporary.CreateFile(
-            Path.Combine("Scripts with spaces", "create.cmd"),
+            Path.Combine("Scripts & 100%!", "চালান^ script.cmd"),
             string.Join(
                 Environment.NewLine,
                 "@echo off",
                 "echo wrapper-test-error 1>&2",
                 "exit /b 7",
                 string.Empty));
-        string standardErrorPath = Path.Combine(temporary.Root, "Logs with spaces", "stderr.txt");
+        string standardErrorPath = Path.Combine(temporary.Root, "Logs & 100%!", "stderr.txt");
         _ = Directory.CreateDirectory(Path.GetDirectoryName(standardErrorPath)!);
         string wrapperPath = temporary.CreateFile(
             Path.Combine("Scripts with spaces", "wrapper.cmd"),
@@ -54,7 +54,7 @@ public sealed class ProcessExecutionTests(TestContext testContext)
     public async Task RunBatchAsyncStopsTheProcessWhenCancellationIsRequested()
     {
         using var temporary = TemporaryDirectory.Create();
-        string markerPath = Path.Combine(temporary.Root, "finished 结束.txt");
+        string markerPath = Path.Combine(temporary.Root, "finished সম্পন্ন.txt");
         string scriptPath = temporary.CreateFile(
             "long-running.cmd",
             string.Join(
@@ -86,7 +86,7 @@ public sealed class ProcessExecutionTests(TestContext testContext)
 
         using var temporary = TemporaryDirectory.Create();
         string scriptPath = temporary.CreateFile(
-            Path.Combine("Scripts & 100%", "実行 script.cmd"),
+            Path.Combine("Scripts & 100%!", "চালান^ script.cmd"),
             string.Join(
                 Environment.NewLine,
                 "@echo off",

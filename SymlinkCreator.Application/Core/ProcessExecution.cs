@@ -137,9 +137,10 @@ public sealed class ElevatedScriptRunner(ScriptWorkspace workspace) : IPrivilege
             "@echo off",
             "setlocal DisableDelayedExpansion",
             "chcp 65001 >NUL",
-            $"call {Quote(scriptPath)} 2> {Quote(standardErrorPath)}",
-            // CALL returns from the generated batch file so its error level can be forwarded.
-            "exit /b %errorlevel%",
+            // Invoke the generated batch directly. CALL performs another expansion pass, and
+            // redirection is unsupported on CALL commands; direct invocation also makes the
+            // generated script's exit code the wrapper process's exit code.
+            $"{Quote(scriptPath)} 2> {Quote(standardErrorPath)}",
             string.Empty);
     }
 
@@ -147,6 +148,6 @@ public sealed class ElevatedScriptRunner(ScriptWorkspace workspace) : IPrivilege
     {
         return BatchScriptSyntax.TryQuote(path, out string quotedPath)
             ? quotedPath
-            : throw new ArgumentException("A script path contains invalid characters.", nameof(path));
+            : throw new ArgumentException("A batch path contains invalid characters.", nameof(path));
     }
 }

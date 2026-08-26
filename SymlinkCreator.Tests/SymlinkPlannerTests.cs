@@ -127,7 +127,7 @@ public sealed class SymlinkPlannerTests
 
         for (int index = 0; index < 12; index++)
         {
-            longSourceDirectory = Path.Combine(longSourceDirectory, $"長いディレクトリ_{index:00}_with spaces");
+            longSourceDirectory = Path.Combine(longSourceDirectory, $"দীর্ঘ_ডিরেক্টরি_{index:00}_with spaces");
         }
 
         bool longPathFixtureCreated;
@@ -146,7 +146,7 @@ public sealed class SymlinkPlannerTests
             Assert.Inconclusive("The current environment does not permit the long-path test fixture.");
         }
 
-        string sourcePath = Path.Combine(longSourceDirectory, "音楽 & 100%.txt");
+        string sourcePath = Path.Combine(longSourceDirectory, "সঙ্গীত & 100%.txt");
         string destinationDirectory = temporary.CreateDirectory("destination");
         File.WriteAllText(sourcePath, "unicode content");
 
@@ -154,8 +154,8 @@ public sealed class SymlinkPlannerTests
             .CreatePlan(new[] { sourcePath }, destinationDirectory)
             .Entries.Single();
 
-        Assert.AreEqual("音楽 & 100%.txt", entry.LinkName);
-        Assert.IsTrue(entry.TargetPath.Contains("長いディレクトリ_11", StringComparison.Ordinal));
+        Assert.AreEqual("সঙ্গীত & 100%.txt", entry.LinkName);
+        Assert.IsTrue(entry.TargetPath.Contains("দীর্ঘ_ডিরেক্টরি_11", StringComparison.Ordinal));
     }
 
     [TestMethod]

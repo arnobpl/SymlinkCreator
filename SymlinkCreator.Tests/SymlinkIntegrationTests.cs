@@ -11,9 +11,9 @@ public sealed class SymlinkIntegrationTests(TestContext testContext)
     {
         using var temporary = TemporaryDirectory.Create();
         string sourcePath = temporary.CreateFile(
-            Path.Combine("音楽 & 100%", "曲 01 !.txt"),
+            Path.Combine("সঙ্গীত & 100%", "গান 01 !.txt"),
             "symbolic link content");
-        string destinationDirectory = temporary.CreateDirectory("目标 folder");
+        string destinationDirectory = temporary.CreateDirectory("গন্তব্য folder");
         if (!CanCreateSymbolicLink(sourcePath, destinationDirectory))
         {
             Assert.Inconclusive("The current Windows environment does not grant the symbolic-link privilege.");
@@ -32,7 +32,7 @@ public sealed class SymlinkIntegrationTests(TestContext testContext)
             0,
             processResult.ExitCode,
             processResult.StandardOutput + processResult.StandardError);
-        string linkPath = Path.Combine(destinationDirectory, "曲 01 !.txt");
+        string linkPath = Path.Combine(destinationDirectory, "গান 01 !.txt");
         Assert.IsTrue(File.Exists(linkPath));
         Assert.IsNotNull(new FileInfo(linkPath).LinkTarget);
         Assert.AreEqual("symbolic link content", File.ReadAllText(linkPath, Encoding.UTF8));
