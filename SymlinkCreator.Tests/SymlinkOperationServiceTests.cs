@@ -4,6 +4,22 @@ namespace SymlinkCreator.Tests;
 public sealed class SymlinkOperationServiceTests
 {
     [TestMethod]
+    public void TryDeleteTemporaryFileLeavesLockedFileWithoutThrowing()
+    {
+        using var temporary = TemporaryDirectory.Create();
+        string filePath = temporary.CreateFile("locked.tmp");
+        using var lockStream = new FileStream(
+            filePath,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.None);
+
+        Assert.IsFalse(ScriptWorkspace.TryDeleteTemporaryFile(filePath));
+
+        Assert.IsTrue(File.Exists(filePath));
+    }
+
+    [TestMethod]
     public async Task ExecuteDeletesGeneratedScriptWhenRetentionIsDisabled()
     {
         using var temporary = TemporaryDirectory.Create();
@@ -42,7 +58,7 @@ public sealed class SymlinkOperationServiceTests
         Assert.AreEqual(runner.Paths.Single(), result.RetainedScriptPath);
         Assert.IsTrue(File.Exists(result.RetainedScriptPath));
         Assert.StartsWith(Path.Combine(temporary.Root, "desktop"), result.RetainedScriptPath);
-        ScriptWorkspace.DeleteIfExists(result.RetainedScriptPath);
+        ScriptWorkspace.TryDeleteTemporaryFile(result.RetainedScriptPath);
     }
 
     [TestMethod]
@@ -63,12 +79,18 @@ public sealed class SymlinkOperationServiceTests
     }
 
     [TestMethod]
-    public async Task ExecuteMapsCancellationAndCleansUpNonRetainedScript()
+    public async Task ExecuteMapsCancellationProgressAndCleansUpNonRetainedScript()
     {
         using var temporary = TemporaryDirectory.Create();
         string sourcePath = temporary.CreateFile("source.txt");
         string destinationDirectory = temporary.CreateDirectory("destination");
-        var runner = new FakeProcessRunner(new ProcessExecutionResult(-1, "cancelled", WasCancelled: true));
+        var runner = new FakeProcessRunner(new ProcessExecutionResult(
+            -1,
+            string.Join(
+                Environment.NewLine,
+                $"{SymlinkScriptProgressParser.EntryAttemptPrefix}1",
+                $"{SymlinkScriptProgressParser.EntrySuccessPrefix}1"),
+            WasCancelled: true));
         SymlinkOperationService service = CreateService(temporary, runner);
 
         SymlinkExecutionException exception = await Assert.ThrowsExactlyAsync<SymlinkExecutionException>(() =>
@@ -77,8 +99,38 @@ public sealed class SymlinkOperationServiceTests
                 CancellationToken.None));
 
         Assert.IsTrue(exception.WasCancelled);
-        Assert.Contains("canceled", exception.Message);
+        Assert.AreEqual(1, exception.Progress.SuccessfulEntryCount);
+        Assert.AreEqual(1, exception.TotalEntryCount);
+        Assert.AreEqual(string.Empty, exception.StandardError);
         Assert.IsFalse(File.Exists(runner.Paths.Single()));
+    }
+
+    [TestMethod]
+    public async Task ExecuteParsesFailedLinkAndPartialSuccess()
+    {
+        using var temporary = TemporaryDirectory.Create();
+        string firstSourcePath = temporary.CreateFile("first.txt");
+        string secondSourcePath = temporary.CreateFile("second.txt");
+        string destinationDirectory = temporary.CreateDirectory("destination");
+        var runner = new FakeProcessRunner(new ProcessExecutionResult(
+            7,
+            string.Join(
+                Environment.NewLine,
+                $"{SymlinkScriptProgressParser.EntryAttemptPrefix}1",
+                $"{SymlinkScriptProgressParser.EntrySuccessPrefix}1",
+                $"{SymlinkScriptProgressParser.EntryAttemptPrefix}2",
+                "target already exists")));
+        SymlinkOperationService service = CreateService(temporary, runner);
+
+        SymlinkExecutionException exception = await Assert.ThrowsExactlyAsync<SymlinkExecutionException>(() =>
+            service.ExecuteAsync(
+                new SymlinkRequest(new[] { firstSourcePath, secondSourcePath }, destinationDirectory),
+                CancellationToken.None));
+
+        Assert.AreEqual(Path.Combine(destinationDirectory, "second.txt"), exception.FailedLinkPath);
+        Assert.AreEqual(1, exception.Progress.SuccessfulEntryCount);
+        Assert.AreEqual(2, exception.TotalEntryCount);
+        Assert.Contains("target already exists", exception.StandardError);
     }
 
     [TestMethod]

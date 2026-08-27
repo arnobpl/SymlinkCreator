@@ -48,6 +48,7 @@ public sealed class LocalizationTests
             "SourceInvalidFormat", "DuplicateLinkNameFormat", "DestinationEntryExistsFormat", "InvalidLinkNameFormat",
             "EmptyPlanError", "GeneratedPathInvalidCharactersError", "DestinationDropError", "DroppedInputErrorFormat",
             "PickerErrorFormat", "ExecutionCompleted", "ExecutionFailed", "ElevationCanceled", "AboutTitle",
+            "ExecutionExitCodeFormat", "ExecutionFailedAtLinkFormat", "ExecutionPartialSuccessFormat",
             "UnexpectedExecutionErrorFormat", "AboutDeveloperFormat", "AboutWebsiteLabel", "AppTitleBar.TitleFormat", "ErrorDialog.Title",
             "ElevationWarning.Title", "ElevationWarning.Message", "SuccessDialog.Title", "DialogOk.Content"
         ];

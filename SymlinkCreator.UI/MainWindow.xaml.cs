@@ -303,7 +303,7 @@ public sealed partial class MainWindow : Window, IDisposable
 
             if (succeeded)
             {
-                if (!ViewModel.HideSuccessfulOperationDialog)
+                if (ViewModel.SuccessMessage is not null)
                 {
                     await ShowMessageAsync(
                         StringResources.GetString("SuccessDialog.Title"),

@@ -42,7 +42,7 @@ public sealed class ProcessExecutionTests(TestContext testContext)
 
         ProcessExecutionResult result = await new ElevatedScriptRunner(workspace).RunAsync(
             "script.cmd",
-            cancellation.Token);
+            cancellationToken: cancellation.Token);
 
         Assert.AreEqual(-1, result.ExitCode);
         Assert.IsTrue(result.WasCancelled);
@@ -97,7 +97,7 @@ public sealed class ProcessExecutionTests(TestContext testContext)
 
         ProcessExecutionResult result = await new ElevatedScriptRunner(workspace).RunAsync(
             scriptPath,
-            testContext.CancellationToken);
+            cancellationToken: testContext.CancellationToken);
 
         Assert.AreEqual(0, result.ExitCode, result.StandardError);
         Assert.Contains("elevated-runner-test", result.StandardError);

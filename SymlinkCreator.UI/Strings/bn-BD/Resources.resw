@@ -52,6 +52,9 @@
   <data name="PickerErrorFormat" xml:space="preserve"><value>ফাইল বা ফোল্ডার নির্বাচন উইন্ডো খোলা যায়নি। {0}</value></data>
   <data name="ExecutionCompleted" xml:space="preserve"><value>কাজ সম্পন্ন হয়েছে।</value></data>
   <data name="ExecutionFailed" xml:space="preserve"><value>সিমলিংক তৈরি ব্যর্থ হয়েছে।</value></data>
+  <data name="ExecutionExitCodeFormat" xml:space="preserve"><value>সিমলিংক স্ক্রিপ্টটি {0} কোড দিয়ে শেষ হয়েছে।</value></data>
+  <data name="ExecutionFailedAtLinkFormat" xml:space="preserve"><value>‘{0}’ তৈরি করার সময় কাজটি ব্যর্থ হয়েছে।</value></data>
+  <data name="ExecutionPartialSuccessFormat" xml:space="preserve"><value>কাজ বন্ধ হওয়ার আগে তৈরি লিংক: {0}/{1}।</value></data>
   <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>সিমলিংক তৈরি শুরু করা যায়নি। {0}</value></data>
   <data name="ElevationCanceled" xml:space="preserve"><value>অ্যাডমিনিস্ট্রেটরের অনুমতির অনুরোধ বাতিল করা হয়েছে।</value></data>
   <data name="AboutTitle" xml:space="preserve"><value>Symlink Creator পরিচিতি</value></data>

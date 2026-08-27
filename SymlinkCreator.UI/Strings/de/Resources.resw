@@ -52,6 +52,9 @@
   <data name="PickerErrorFormat" xml:space="preserve"><value>Die Datei- oder Ordnerauswahl konnte nicht geöffnet werden. {0}</value></data>
   <data name="ExecutionCompleted" xml:space="preserve"><value>Ausführung abgeschlossen.</value></data>
   <data name="ExecutionFailed" xml:space="preserve"><value>Die Erstellung symbolischer Links ist fehlgeschlagen.</value></data>
+  <data name="ExecutionExitCodeFormat" xml:space="preserve"><value>Das Symlink-Skript wurde mit dem Code {0} beendet.</value></data>
+  <data name="ExecutionFailedAtLinkFormat" xml:space="preserve"><value>Der Vorgang ist beim Erstellen von „{0}“ fehlgeschlagen.</value></data>
+  <data name="ExecutionPartialSuccessFormat" xml:space="preserve"><value>Links, die vor dem Anhalten des Vorgangs erstellt wurden: {0} von {1}.</value></data>
   <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>Die Erstellung symbolischer Links konnte nicht gestartet werden. {0}</value></data>
   <data name="ElevationCanceled" xml:space="preserve"><value>Die Anforderung der Administratorrechte wurde abgebrochen.</value></data>
   <data name="AboutTitle" xml:space="preserve"><value>Info zu Symlink Creator</value></data>

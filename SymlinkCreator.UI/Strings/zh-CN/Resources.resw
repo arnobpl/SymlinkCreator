@@ -52,6 +52,9 @@
   <data name="PickerErrorFormat" xml:space="preserve"><value>无法打开文件或文件夹选择器。{0}</value></data>
   <data name="ExecutionCompleted" xml:space="preserve"><value>执行完成。</value></data>
   <data name="ExecutionFailed" xml:space="preserve"><value>符号链接创建失败。</value></data>
+  <data name="ExecutionExitCodeFormat" xml:space="preserve"><value>符号链接脚本已以代码 {0} 退出。</value></data>
+  <data name="ExecutionFailedAtLinkFormat" xml:space="preserve"><value>创建“{0}”时操作失败。</value></data>
+  <data name="ExecutionPartialSuccessFormat" xml:space="preserve"><value>操作停止前创建的链接：{0}/{1}。</value></data>
   <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>无法启动符号链接创建。{0}</value></data>
   <data name="ElevationCanceled" xml:space="preserve"><value>管理员权限请求已取消。</value></data>
   <data name="AboutTitle" xml:space="preserve"><value>关于 Symlink Creator</value></data>

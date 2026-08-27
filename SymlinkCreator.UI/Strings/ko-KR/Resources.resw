@@ -52,6 +52,9 @@
   <data name="PickerErrorFormat" xml:space="preserve"><value>파일 또는 폴더 선택기를 열 수 없습니다. {0}</value></data>
   <data name="ExecutionCompleted" xml:space="preserve"><value>실행이 완료되었습니다.</value></data>
   <data name="ExecutionFailed" xml:space="preserve"><value>심볼릭 링크를 만들지 못했습니다.</value></data>
+  <data name="ExecutionExitCodeFormat" xml:space="preserve"><value>심볼릭 링크 스크립트가 코드 {0}(으)로 종료되었습니다.</value></data>
+  <data name="ExecutionFailedAtLinkFormat" xml:space="preserve"><value>'{0}'을(를) 만드는 동안 작업에 실패했습니다.</value></data>
+  <data name="ExecutionPartialSuccessFormat" xml:space="preserve"><value>작업 중지 전에 생성된 링크: {0}/{1}.</value></data>
   <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>심볼릭 링크 생성을 시작할 수 없습니다. {0}</value></data>
   <data name="ElevationCanceled" xml:space="preserve"><value>관리자 권한 요청이 취소되었습니다.</value></data>
   <data name="AboutTitle" xml:space="preserve"><value>Symlink Creator 정보</value></data>

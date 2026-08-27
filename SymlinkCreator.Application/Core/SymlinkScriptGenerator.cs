@@ -30,8 +30,14 @@ public sealed class SymlinkScriptGenerator : ISymlinkScriptGenerator
             .AppendLine();
         _ = script.AppendLine("if errorlevel 1 exit /b %errorlevel%");
 
-        foreach (SymlinkEntry entry in plan.Entries)
+        for (int index = 0; index < plan.Entries.Count; index++)
         {
+            SymlinkEntry entry = plan.Entries[index];
+            int entryNumber = index + 1;
+            _ = script
+                .Append(">&2 echo ")
+                .Append(SymlinkScriptProgressParser.EntryAttemptPrefix)
+                .AppendLine(entryNumber.ToString(System.Globalization.CultureInfo.InvariantCulture));
             _ = script.Append("mklink ");
             if (entry.IsDirectory)
             {
@@ -42,9 +48,15 @@ public sealed class SymlinkScriptGenerator : ISymlinkScriptGenerator
             _ = script.Append(' ');
             _ = script.AppendLine(Quote(entry.TargetPath));
             _ = script.AppendLine("if errorlevel 1 exit /b %errorlevel%");
+            _ = script
+                .Append(">&2 echo ")
+                .Append(SymlinkScriptProgressParser.EntrySuccessPrefix)
+                .AppendLine(entryNumber.ToString(System.Globalization.CultureInfo.InvariantCulture));
         }
 
-        _ = script.AppendLine("exit /b %errorlevel%");
+        // Every failed mklink exits immediately, so progress-marker commands cannot affect the
+        // success status of a completed batch.
+        _ = script.AppendLine("exit /b 0");
         return script.ToString();
     }
 

@@ -65,6 +65,8 @@ public sealed class MainWindowViewModel(
         SourcePaths.Count > 0 &&
         !string.IsNullOrWhiteSpace(DestinationPath);
 
+    public bool CanEditRequest => !IsCreatingSymlinks;
+
     public void ApplyStartupOptions(StartupOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -148,8 +150,8 @@ public sealed class MainWindowViewModel(
         catch (SymlinkExecutionException exception)
         {
             ErrorMessage = exception.WasCancelled
-                ? _resources.GetString("ElevationCanceled")
-                : $"{_resources.GetString("ExecutionFailed")}\n{exception.Message}";
+                ? CreateCancellationMessage(exception)
+                : CreateFailureMessage(exception);
             return false;
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -212,6 +214,52 @@ public sealed class MainWindowViewModel(
         OnPropertyChanged(nameof(CanCreateSymlinks));
     }
 
+    private string CreateCancellationMessage(SymlinkExecutionException exception)
+    {
+        List<string> details = [_resources.GetString("ElevationCanceled")];
+        AddExecutionProgress(details, exception);
+        return string.Join(Environment.NewLine, details);
+    }
+
+    private string CreateFailureMessage(SymlinkExecutionException exception)
+    {
+        List<string> details = [_resources.GetString("ExecutionFailed")];
+        if (exception.FailedLinkPath is not null)
+        {
+            details.Add(string.Format(
+                System.Globalization.CultureInfo.CurrentCulture,
+                _resources.GetString("ExecutionFailedAtLinkFormat"),
+                exception.FailedLinkPath));
+        }
+
+        AddExecutionProgress(details, exception);
+        details.Add(string.Format(
+            System.Globalization.CultureInfo.CurrentCulture,
+            _resources.GetString("ExecutionExitCodeFormat"),
+            exception.ExitCode));
+        string standardError = exception.StandardError.Trim();
+        if (standardError.Length > 0)
+        {
+            details.Add(standardError);
+        }
+        return string.Join(Environment.NewLine, details);
+    }
+
+    private void AddExecutionProgress(
+        List<string> details,
+        SymlinkExecutionException exception)
+    {
+        if (exception.Progress.SuccessfulEntryCount is int successfulEntryCount &&
+            exception.TotalEntryCount is int totalEntryCount)
+        {
+            details.Add(string.Format(
+                System.Globalization.CultureInfo.CurrentCulture,
+                _resources.GetString("ExecutionPartialSuccessFormat"),
+                successfulEntryCount,
+                totalEntryCount));
+        }
+    }
+
     private bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(storage, value))
@@ -224,6 +272,10 @@ public sealed class MainWindowViewModel(
         if (propertyName is nameof(DestinationPath) or nameof(IsCreatingSymlinks))
         {
             OnPropertyChanged(nameof(CanCreateSymlinks));
+            if (propertyName == nameof(IsCreatingSymlinks))
+            {
+                OnPropertyChanged(nameof(CanEditRequest));
+            }
         }
 
         return true;

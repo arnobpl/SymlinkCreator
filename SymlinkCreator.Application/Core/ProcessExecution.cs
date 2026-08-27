@@ -4,7 +4,10 @@ using System.Text;
 
 namespace SymlinkCreator.Application.Core;
 
-public sealed record ProcessExecutionResult(int ExitCode, string StandardError, bool WasCancelled = false)
+public sealed record ProcessExecutionResult(
+    int ExitCode,
+    string StandardError,
+    bool WasCancelled = false)
 {
     public const string CancellationMessage = "The elevation request was canceled.";
 }
@@ -71,28 +74,36 @@ public sealed class ElevatedScriptRunner(ScriptWorkspace workspace) : IPrivilege
             // before the per-run wrapper files are removed in finally.
             await process.WaitForExitAsync(cancellationToken);
 
-            string standardError = await File.ReadAllTextAsync(standardErrorPath, cancellationToken);
-            return new ProcessExecutionResult(process.ExitCode, standardError);
+            return await ReadExecutionResultAsync(
+                process,
+                standardErrorPath,
+                cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            bool processStopped = process is null || await StopProcessAsync(process);
-            return processStopped
-                ? CreateCancelledResult()
-                : new ProcessExecutionResult(
-                    -1,
-                    "The elevation request was canceled, but Windows did not permit the elevated process to be stopped.",
-                    WasCancelled: true);
+            if (process is null)
+            {
+                return CreateCancelledResult();
+            }
+
+            ProcessTerminationResult termination = await StopProcessAsync(process);
+            ProcessExecutionResult actualResult = await ReadExecutionResultAsync(
+                process,
+                standardErrorPath,
+                CancellationToken.None);
+            return termination == ProcessTerminationResult.Killed
+                ? actualResult with { ExitCode = -1, WasCancelled = true }
+                : actualResult;
         }
         catch (Win32Exception ex) when (ex.NativeErrorCode == ErrorCancelled)
         {
-            return new ProcessExecutionResult(-1, ex.Message, WasCancelled: true);
+            return CreateCancelledResult();
         }
         finally
         {
             process?.Dispose();
-            ScriptWorkspace.DeleteIfExists(wrapperPath);
-            ScriptWorkspace.DeleteIfExists(standardErrorPath);
+            ScriptWorkspace.TryDeleteTemporaryFile(wrapperPath);
+            ScriptWorkspace.TryDeleteTemporaryFile(standardErrorPath);
         }
     }
 
@@ -104,7 +115,23 @@ public sealed class ElevatedScriptRunner(ScriptWorkspace workspace) : IPrivilege
             WasCancelled: true);
     }
 
-    private static async Task<bool> StopProcessAsync(Process process)
+    private enum ProcessTerminationResult
+    {
+        AlreadyExited,
+        Killed,
+        StopFailed
+    }
+
+    private static async Task<ProcessExecutionResult> ReadExecutionResultAsync(
+        Process process,
+        string standardErrorPath,
+        CancellationToken cancellationToken = default)
+    {
+        string standardError = await File.ReadAllTextAsync(standardErrorPath, cancellationToken);
+        return new ProcessExecutionResult(process.ExitCode, standardError);
+    }
+
+    private static async Task<ProcessTerminationResult> StopProcessAsync(Process process)
     {
         try
         {
@@ -114,19 +141,35 @@ public sealed class ElevatedScriptRunner(ScriptWorkspace workspace) : IPrivilege
                 // Cleanup must not be canceled with the caller's token; otherwise the child
                 // could remain running after RunAsync has reported cancellation.
                 await process.WaitForExitAsync(CancellationToken.None);
+                return ProcessTerminationResult.Killed;
             }
 
-            return true;
+            return ProcessTerminationResult.AlreadyExited;
         }
         catch (InvalidOperationException)
         {
             // The process can exit between HasExited and Kill.
-            return true;
+            return ProcessTerminationResult.AlreadyExited;
         }
         catch (Win32Exception)
         {
             // A non-elevated caller may not be allowed to terminate an elevated process.
-            return false;
+            // The process must finish before the wrapper and stderr files are deleted; otherwise
+            // the still-running elevated child can fail to read its script or write its stderr.
+            await WaitForExitBeforeCleanupAsync(process);
+            return ProcessTerminationResult.StopFailed;
+        }
+    }
+
+    private static async Task WaitForExitBeforeCleanupAsync(Process process)
+    {
+        try
+        {
+            await process.WaitForExitAsync(CancellationToken.None);
+        }
+        catch (InvalidOperationException)
+        {
+            // The process can exit or lose its handle between the failed Kill and this wait.
         }
     }
 

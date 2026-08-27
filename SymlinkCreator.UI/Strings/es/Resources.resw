@@ -52,6 +52,9 @@
   <data name="PickerErrorFormat" xml:space="preserve"><value>No se pudo abrir el selector de archivos o carpetas. {0}</value></data>
   <data name="ExecutionCompleted" xml:space="preserve"><value>Ejecución completada.</value></data>
   <data name="ExecutionFailed" xml:space="preserve"><value>La creación de enlaces simbólicos ha fallado.</value></data>
+  <data name="ExecutionExitCodeFormat" xml:space="preserve"><value>El script de enlaces simbólicos terminó con el código {0}.</value></data>
+  <data name="ExecutionFailedAtLinkFormat" xml:space="preserve"><value>Se produjo un error al crear '{0}'.</value></data>
+  <data name="ExecutionPartialSuccessFormat" xml:space="preserve"><value>Enlaces creados antes de detener la operación: {0} de {1}.</value></data>
   <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>No se pudo iniciar la creación de enlaces simbólicos. {0}</value></data>
   <data name="ElevationCanceled" xml:space="preserve"><value>Se canceló la solicitud de permisos de administrador.</value></data>
   <data name="AboutTitle" xml:space="preserve"><value>Acerca de Symlink Creator</value></data>

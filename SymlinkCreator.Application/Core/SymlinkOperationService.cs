@@ -23,29 +23,34 @@ public sealed class SymlinkOperationService(
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
 
-        SymlinkPlan plan = _planner.CreatePlan(
-            request.SourcePaths,
-            request.DestinationDirectory,
-            request.UseRelativePath);
-        // Planning and generation are synchronous; observe cancellation between those phases
-        // before creating or running the generated script.
-        cancellationToken.ThrowIfCancellationRequested();
+        (SymlinkPlan plan, string script) = await Task.Run(
+            () => PrepareOperation(request, cancellationToken),
+            cancellationToken);
         string scriptPath = _workspace.CreateScriptPath(request.RetainScriptFile);
 
         try
         {
-            string script = _scriptGenerator.Generate(plan);
-            cancellationToken.ThrowIfCancellationRequested();
             await _workspace.WriteScriptAsync(scriptPath, script, cancellationToken);
-            ProcessExecutionResult processResult = await _processRunner.RunAsync(
+            ProcessExecutionResult rawProcessResult = await _processRunner.RunAsync(
                 scriptPath,
                 cancellationToken);
+            (string standardError, SymlinkScriptProgress progress) = SymlinkScriptProgressParser.Parse(
+                rawProcessResult.ExitCode,
+                rawProcessResult.StandardError,
+                plan.Entries.Count);
+            ProcessExecutionResult processResult = rawProcessResult with
+            {
+                StandardError = standardError
+            };
 
             return processResult.ExitCode != 0
                 ? throw new SymlinkExecutionException(
-                    CreateFailureMessage(processResult),
+                    processResult.StandardError,
                     processResult.ExitCode,
-                    processResult.WasCancelled)
+                    processResult.WasCancelled,
+                    GetFailedLinkPath(plan, processResult, progress),
+                    progress,
+                    plan.Entries.Count)
                 : new SymlinkOperationResult(
                 plan,
                 request.RetainScriptFile ? scriptPath : null,
@@ -55,21 +60,36 @@ public sealed class SymlinkOperationService(
         {
             if (!request.RetainScriptFile)
             {
-                ScriptWorkspace.DeleteIfExists(scriptPath);
+                ScriptWorkspace.TryDeleteTemporaryFile(scriptPath);
             }
         }
     }
 
-    private static string CreateFailureMessage(ProcessExecutionResult result)
+    private (SymlinkPlan Plan, string Script) PrepareOperation(
+        SymlinkRequest request,
+        CancellationToken cancellationToken)
     {
-        if (result.WasCancelled)
-        {
-            return ProcessExecutionResult.CancellationMessage;
-        }
+        cancellationToken.ThrowIfCancellationRequested();
+        SymlinkPlan plan = _planner.CreatePlan(
+            request.SourcePaths,
+            request.DestinationDirectory,
+            request.UseRelativePath);
+        cancellationToken.ThrowIfCancellationRequested();
+        string script = _scriptGenerator.Generate(plan);
+        cancellationToken.ThrowIfCancellationRequested();
+        return (plan, script);
+    }
 
-        string detail = result.StandardError.Trim();
-        return detail.Length == 0
-            ? $"The symlink script exited with code {result.ExitCode}."
-            : $"The symlink script exited with code {result.ExitCode}.\n{detail}";
+    private static string? GetFailedLinkPath(
+        SymlinkPlan plan,
+        ProcessExecutionResult result,
+        SymlinkScriptProgress progress)
+    {
+        return !result.WasCancelled &&
+            progress.FailedEntryIndex is int index &&
+            index >= 0 &&
+            index < plan.Entries.Count
+            ? plan.Entries[index].LinkPath
+            : null;
     }
 }

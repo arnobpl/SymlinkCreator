@@ -52,6 +52,9 @@
   <data name="PickerErrorFormat" xml:space="preserve"><value>ファイルまたはフォルダーの選択画面を開けませんでした。{0}</value></data>
   <data name="ExecutionCompleted" xml:space="preserve"><value>実行が完了しました。</value></data>
   <data name="ExecutionFailed" xml:space="preserve"><value>シンボリック リンクの作成に失敗しました。</value></data>
+  <data name="ExecutionExitCodeFormat" xml:space="preserve"><value>シンボリック リンク スクリプトがコード {0} で終了しました。</value></data>
+  <data name="ExecutionFailedAtLinkFormat" xml:space="preserve"><value>「{0}」の作成中に操作に失敗しました。</value></data>
+  <data name="ExecutionPartialSuccessFormat" xml:space="preserve"><value>操作停止前に作成されたリンク: {0}/{1}。</value></data>
   <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>シンボリック リンクの作成を開始できませんでした。{0}</value></data>
   <data name="ElevationCanceled" xml:space="preserve"><value>管理者権限の要求がキャンセルされました。</value></data>
   <data name="AboutTitle" xml:space="preserve"><value>Symlink Creator のバージョン情報</value></data>

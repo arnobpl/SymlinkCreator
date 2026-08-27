@@ -55,6 +55,7 @@
                         x:Name="SourceListView"
                         AllowDrop="True"
                         Background="Transparent"
+                        IsEnabled="{x:Bind ViewModel.CanEditRequest, Mode=OneWay}"
                         ItemsSource="{x:Bind ViewModel.SourcePaths, Mode=OneWay}"
                         SelectionMode="Multiple">
                         <ListView.ItemTemplate>
@@ -75,8 +76,8 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" Spacing="8">
-                        <controls:WrappedButton x:Name="AddFilesButton" />
-                        <controls:WrappedButton x:Name="AddFoldersButton" />
+                        <controls:WrappedButton x:Name="AddFilesButton" IsEnabled="{x:Bind ViewModel.CanEditRequest, Mode=OneWay}" />
+                        <controls:WrappedButton x:Name="AddFoldersButton" IsEnabled="{x:Bind ViewModel.CanEditRequest, Mode=OneWay}" />
                     </StackPanel>
 
                     <Grid
@@ -88,8 +89,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <controls:WrappedButton x:Name="RemoveSelectedButton" Grid.Column="0" />
-                        <controls:WrappedButton x:Name="ClearListButton" Grid.Column="1" />
+                        <controls:WrappedButton x:Name="RemoveSelectedButton" Grid.Column="0" IsEnabled="{x:Bind ViewModel.CanEditRequest, Mode=OneWay}" />
+                        <controls:WrappedButton x:Name="ClearListButton" Grid.Column="1" IsEnabled="{x:Bind ViewModel.CanEditRequest, Mode=OneWay}" />
                     </Grid>
                 </Grid>
             </Grid>
@@ -123,8 +124,9 @@
                         x:Name="DestinationPathTextBox"
                         Grid.Column="0"
                         AllowDrop="True"
+                        IsEnabled="{x:Bind ViewModel.CanEditRequest, Mode=OneWay}"
                         Text="{x:Bind ViewModel.DestinationPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <controls:WrappedButton x:Name="BrowseButton" Grid.Column="1" />
+                    <controls:WrappedButton x:Name="BrowseButton" Grid.Column="1" IsEnabled="{x:Bind ViewModel.CanEditRequest, Mode=OneWay}" />
                 </Grid>
 
                 <Border
@@ -133,9 +135,18 @@
                     Background="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
 
                 <StackPanel Grid.Row="3" Spacing="8">
-                    <CheckBox x:Name="RelativePathCheckBox" IsChecked="{x:Bind ViewModel.UseRelativePath, Mode=TwoWay}" />
-                    <CheckBox x:Name="RetainScriptCheckBox" IsChecked="{x:Bind ViewModel.RetainScriptFile, Mode=TwoWay}" />
-                    <CheckBox x:Name="HideSuccessCheckBox" IsChecked="{x:Bind ViewModel.HideSuccessfulOperationDialog, Mode=TwoWay}" />
+                    <CheckBox
+                        x:Name="RelativePathCheckBox"
+                        IsChecked="{x:Bind ViewModel.UseRelativePath, Mode=TwoWay}"
+                        IsEnabled="{x:Bind ViewModel.CanEditRequest, Mode=OneWay}" />
+                    <CheckBox
+                        x:Name="RetainScriptCheckBox"
+                        IsChecked="{x:Bind ViewModel.RetainScriptFile, Mode=TwoWay}"
+                        IsEnabled="{x:Bind ViewModel.CanEditRequest, Mode=OneWay}" />
+                    <CheckBox
+                        x:Name="HideSuccessCheckBox"
+                        IsChecked="{x:Bind ViewModel.HideSuccessfulOperationDialog, Mode=TwoWay}"
+                        IsEnabled="{x:Bind ViewModel.CanEditRequest, Mode=OneWay}" />
                 </StackPanel>
 
                 <Grid Grid.Row="5" ColumnSpacing="8">

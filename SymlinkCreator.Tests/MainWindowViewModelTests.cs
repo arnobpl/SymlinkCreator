@@ -17,6 +17,7 @@ public sealed class MainWindowViewModelTests(TestContext testContext)
         Assert.IsFalse(viewModel.HideSuccessfulOperationDialog);
         Assert.IsFalse(viewModel.IsCreatingSymlinks);
         Assert.IsFalse(viewModel.CanCreateSymlinks);
+        Assert.IsTrue(viewModel.CanEditRequest);
     }
 
     [TestMethod]
@@ -105,6 +106,7 @@ public sealed class MainWindowViewModelTests(TestContext testContext)
 
         Assert.IsTrue(viewModel.IsCreatingSymlinks);
         Assert.IsFalse(viewModel.CanCreateSymlinks);
+        Assert.IsFalse(viewModel.CanEditRequest);
         Assert.IsFalse(await viewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
         Assert.HasCount(1, operationService.Requests);
 
@@ -112,6 +114,7 @@ public sealed class MainWindowViewModelTests(TestContext testContext)
         Assert.IsTrue(await operation);
         Assert.IsFalse(viewModel.IsCreatingSymlinks);
         Assert.IsTrue(viewModel.CanCreateSymlinks);
+        Assert.IsTrue(viewModel.CanEditRequest);
     }
 
     [TestMethod]
@@ -131,16 +134,39 @@ public sealed class MainWindowViewModelTests(TestContext testContext)
     {
         MainWindowViewModel canceledViewModel = CreateViewModel(
             out _,
-            new SymlinkExecutionException("ignored", -1, wasCancelled: true));
+            new SymlinkExecutionException(ProcessExecutionResult.CancellationMessage, -1, wasCancelled: true));
         canceledViewModel.AddSourcePaths(SingleSourcePath);
         canceledViewModel.DestinationPath = "destination";
 
         Assert.IsFalse(await canceledViewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
         Assert.AreEqual("The elevation request was canceled.", canceledViewModel.ErrorMessage);
 
+        MainWindowViewModel diagnosticViewModel = CreateViewModel(
+            out _,
+            new SymlinkExecutionException(
+                "The operation completed naturally.",
+                -1,
+                wasCancelled: true,
+                progress: new SymlinkScriptProgress(SuccessfulEntryCount: 1),
+                totalEntryCount: 2));
+        diagnosticViewModel.AddSourcePaths(SingleSourcePath);
+        diagnosticViewModel.DestinationPath = "destination";
+
+        Assert.IsFalse(await diagnosticViewModel.TryCreateSymlinksAsync(testContext.CancellationToken));
+        string diagnosticErrorMessage = diagnosticViewModel.ErrorMessage
+            ?? throw new AssertFailedException("Expected a cancellation diagnostic.");
+        Assert.Contains("The elevation request was canceled.", diagnosticErrorMessage);
+        Assert.Contains("Links created before the operation stopped: 1 of 2.", diagnosticErrorMessage);
+
         MainWindowViewModel failedViewModel = CreateViewModel(
             out _,
-            new SymlinkExecutionException("target already exists", 7, wasCancelled: false));
+            new SymlinkExecutionException(
+                "target already exists",
+                7,
+                wasCancelled: false,
+                failedLinkPath: "destination\\source.txt",
+                progress: new SymlinkScriptProgress(SuccessfulEntryCount: 1),
+                totalEntryCount: 2));
         failedViewModel.AddSourcePaths(SingleSourcePath);
         failedViewModel.DestinationPath = "destination";
 
@@ -148,6 +174,9 @@ public sealed class MainWindowViewModelTests(TestContext testContext)
         string? errorMessage = failedViewModel.ErrorMessage;
         Assert.IsNotNull(errorMessage);
         Assert.Contains("Symlink creation failed.", errorMessage);
+        Assert.Contains("The operation failed while creating 'destination\\source.txt'.", errorMessage);
+        Assert.Contains("Links created before the operation stopped: 1 of 2.", errorMessage);
+        Assert.Contains("The symlink script exited with code 7.", errorMessage);
         Assert.Contains("target already exists", errorMessage);
     }
 
@@ -242,6 +271,9 @@ public sealed class MainWindowViewModelTests(TestContext testContext)
             ["GeneratedPathInvalidCharactersError"] = "A generated script path contains invalid characters.",
             ["ExecutionCompleted"] = "Execution completed.",
             ["ExecutionFailed"] = "Symlink creation failed.",
+            ["ExecutionExitCodeFormat"] = "The symlink script exited with code {0}.",
+            ["ExecutionFailedAtLinkFormat"] = "The operation failed while creating '{0}'.",
+            ["ExecutionPartialSuccessFormat"] = "Links created before the operation stopped: {0} of {1}.",
             ["UnexpectedExecutionErrorFormat"] = "Symlink creation could not be started. {0}",
             ["ElevationCanceled"] = "The elevation request was canceled."
         };

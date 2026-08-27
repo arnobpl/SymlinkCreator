@@ -60,6 +60,9 @@
   <data name="PickerErrorFormat" xml:space="preserve"><value>The file or folder picker could not be opened. {0}</value></data>
   <data name="ExecutionCompleted" xml:space="preserve"><value>Execution completed.</value></data>
   <data name="ExecutionFailed" xml:space="preserve"><value>Symlink creation failed.</value></data>
+  <data name="ExecutionExitCodeFormat" xml:space="preserve"><value>The symlink script exited with code {0}.</value></data>
+  <data name="ExecutionFailedAtLinkFormat" xml:space="preserve"><value>The operation failed while creating '{0}'.</value></data>
+  <data name="ExecutionPartialSuccessFormat" xml:space="preserve"><value>Links created before the operation stopped: {0} of {1}.</value></data>
   <data name="UnexpectedExecutionErrorFormat" xml:space="preserve"><value>Symlink creation could not be started. {0}</value></data>
   <data name="ElevationCanceled" xml:space="preserve"><value>The elevation request was canceled.</value></data>
   <data name="AboutTitle" xml:space="preserve"><value>About Symlink Creator</value></data>

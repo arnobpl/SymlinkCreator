@@ -45,9 +45,23 @@ public sealed class SymlinkValidationException(
     public IReadOnlyList<string> MessageArguments { get; } = Array.AsReadOnly([.. messageArguments]);
 }
 
-public sealed class SymlinkExecutionException(string message, int exitCode, bool wasCancelled) : InvalidOperationException(message)
+public sealed class SymlinkExecutionException(
+    string standardError,
+    int exitCode,
+    bool wasCancelled,
+    string? failedLinkPath = null,
+    SymlinkScriptProgress? progress = null,
+    int? totalEntryCount = null) : InvalidOperationException(standardError)
 {
     public int ExitCode { get; } = exitCode;
 
+    public string StandardError { get; } = standardError;
+
     public bool WasCancelled { get; } = wasCancelled;
+
+    public string? FailedLinkPath { get; } = failedLinkPath;
+
+    public SymlinkScriptProgress Progress { get; } = progress ?? new SymlinkScriptProgress();
+
+    public int? TotalEntryCount { get; } = totalEntryCount;
 }

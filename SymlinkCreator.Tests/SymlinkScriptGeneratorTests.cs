@@ -30,8 +30,11 @@ public sealed class SymlinkScriptGeneratorTests
         Assert.Contains(
             "cd /d \"C:\\Destination Folder\"\r\nif errorlevel 1 exit /b %errorlevel%",
             script);
+        Assert.Contains("exit /b 0", script);
         Assert.Contains("mklink \"file.txt\" \"..\\Source Folder\\file.txt\"", script);
         Assert.Contains("mklink /d \"folder\" \"..\\Source Folder\\folder\"", script);
+        Assert.Contains($">&2 echo {SymlinkScriptProgressParser.EntryAttemptPrefix}1", script);
+        Assert.Contains($">&2 echo {SymlinkScriptProgressParser.EntrySuccessPrefix}2", script);
         Assert.AreEqual(3, CountOccurrences(script, "if errorlevel 1 exit /b %errorlevel%"));
     }
 

@@ -46,9 +46,23 @@ public sealed class ScriptWorkspace(
             cancellationToken);
     }
 
-    public static void DeleteIfExists(string path)
+    public static bool TryDeleteTemporaryFile(string path)
     {
-        File.Delete(path);
+        try
+        {
+            File.Delete(path);
+            return true;
+        }
+        catch (IOException)
+        {
+            // A transiently locked temporary file may remain; cleanup must not replace the result.
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            // A transiently locked temporary file may remain; cleanup must not replace the result.
+            return false;
+        }
     }
 
     private static string GetDefaultRootDirectory()
