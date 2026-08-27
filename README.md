@@ -4,7 +4,22 @@
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Release](https://img.shields.io/github/v/release/arnobpl/SymlinkCreator)](https://github.com/arnobpl/SymlinkCreator/releases/latest)
 
-Symlink Creator is a Windows GUI app for creating multiple symbolic links (symlinks) at once using the [`mklink`](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/mklink) command.
+Symlink Creator is a free, open-source Windows GUI for creating multiple file and folder symbolic links (symlinks) at once. Add any number of existing source paths, choose one destination folder, and let the app run the required Windows [`mklink`](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/mklink) commands—without writing a batch script by hand.
+
+![Symlink Creator showing multiple source paths and one destination folder](docs/assets/Screenshot.png "Symlink Creator for Windows")
+
+**Built for batch workflows:** many sources → one destination folder → one symbolic link per source.
+
+## Features
+
+- **Batch symlink creation:** turn multiple source files and folders into links in one destination folder with a single operation.
+- **Flexible input:** select files or folders, drag them from File Explorer, or drop text containing one path per line.
+- **Target path control:** use relative targets when the source and destination are on the same drive, or use absolute targets when the links must remain independent of the destination's location.
+- **Transparent execution:** optionally retain the generated `.cmd` file on the Desktop for review or troubleshooting.
+- **Reusable startup options:** preselect language, path behavior, script retention, and success-dialog behavior from a Windows shortcut.
+- **Localized interface:** available in English, Bengali, German, Spanish, French, Japanese, Korean, Brazilian Portuguese, and Simplified Chinese.
+- **Modern Windows support:** install through WinGet or download x64 and native ARM64 packages for Windows 10 and Windows 11.
+- **Free and open source:** released under the [MIT License](LICENSE).
 
 ## Get Symlink Creator
 
@@ -31,7 +46,8 @@ symlinkcreator
 
 🗂️ [View all releases](https://github.com/arnobpl/SymlinkCreator/releases)
 
-#### Manual ZIP prerequisites
+<details>
+<summary><strong>Manual ZIP prerequisites</strong></summary>
 
 Before running the framework-dependent ZIP, install its prerequisites:
 
@@ -44,42 +60,53 @@ $vcRuntime = "Microsoft.VCRedist.2015+.$vcArchitecture"
 winget install --id $vcRuntime --exact --source winget
 ```
 
-## Development
+</details>
 
-Build, test, clean, and release instructions are available in the [development and release guide](docs/Development.md).
+## New to symbolic links?
 
-## Use cases
+A symbolic link is a small filesystem entry that points to a file or folder somewhere else. Most applications can open the link as though the target existed at the link's location. The target's contents are not duplicated, and changes made through the link affect the original target.
 
-- Suppose, you have a collection of several songs sorted by artists and albums on your PC. You might want a separate collection of your favorite songs which you will store on your mobile devices. In this scenario, the traditional shortcut option through the File Explorer right-click context menu is insufficient, because you cannot copy the actual file contents by copying the traditional shortcut files (_\*.lnk_). You might consider duplicating the files which you will store on your mobile devices. But it will waste the storage space of your PC. In this case, Symlink Creator will come in handy. You can easily create a separate collection of songs and transfer them to your mobile devices, without wasting your PC's storage space.
+| Option | How it behaves | Best suited for |
+| --- | --- | --- |
+| **Symbolic link** | Appears at a filesystem path and redirects applications to the original file or folder | Making the same content available from another path without duplicating it |
+| **Windows shortcut (`.lnk`)** | Opens another item through Windows Shell, but remains a separate shortcut file | Launching files, folders, or applications interactively |
+| **Copy** | Creates independent data that consumes additional storage and can diverge from the original | Keeping a separate version that must survive changes to the original |
 
-- Suppose, you have a special folder that is linked to your online storage like Google Drive. You might want some specific files/folders to be backed up from other folders. A traditional shortcut file is not helpful here to back up those files. In this scenario, you can use Symlink Creator for backup purposes without duplicating those files/folders in the special folder.
+Deleting a symbolic link removes the link, not its target. Moving or deleting the target breaks the link until its target path is restored. Software such as backup, cloud-sync, and game-management tools may choose whether to follow symbolic links, so verify their behavior before relying on a linked layout.
 
-- Suppose, you play video games a lot and you have the Steam client to manage those games. You have set a non-system drive (say, _D:_) to download the games. But that non-system drive has slow read capacity but your system drive (say, _C:_) has SSD which is a lot faster to read. In that scenario, you can use Symlink Creator to save your favorite video games in the SSD so that you can load those games faster without changing any settings in the Steam client. Symlink Creator can create symlinks of the folders of video games in the slow non-system drive, but the game files are actually stored in the fast SSD.
+## Common use cases
 
-## What Symlink Creator does
+- **Organize media in more than one collection.** Keep music or videos in an artist, album, or project structure while building a separate favorites collection from links. The same media stays in one place and does not consume storage twice.
 
-Symlink Creator creates _symlinks_ which is an NTFS feature. Unlike the traditional shortcut files (_\*.lnk_), symlinks do not have any _file size_. While symlinks may be called advanced shortcut files, they appear to be real files. Unlike duplicated files, symlinks do not waste your storage space. Symlink Creator works for both files and folders.
+- **Bring scattered content into one working folder.** Make selected files or folders appear together for a media server, development tool, or other application without reorganizing the originals. This is especially convenient when many links need to be created at once.
+
+- **Move game or application data without changing its expected path.** After moving a folder to a faster or larger drive, create a folder symlink in the original parent directory. The application can continue using its familiar path while the data lives on the other drive.
+
+- **Reuse shared development assets.** Keep common configuration, tools, SDKs, or large assets in one location and link them into the project directories where they are expected.
 
 ## How Symlink Creator works
 
-- Symlink Creator uses the `mklink` command to create symlinks by generating and executing a script.
-- It works on Windows 11/10.
+For every source path, Symlink Creator plans a link with the same file or folder name inside the selected destination directory. It validates the paths and name collisions first, generates the corresponding `mklink` commands, and then asks Windows for the permission needed to run them. It creates symbolic links only; it does not move, copy, or delete the source content.
 
 ## How to use Symlink Creator
 
-![Screenshot](docs/assets/Screenshot.png "Screenshot of Symlink Creator")
+1. Add one or more source files or folders:
+   - Select them with **Add files** or **Add folders**.
+   - Drag them from File Explorer into the source list.
+   - Drop text containing one source path per line into the source list.
+2. Enter an existing destination directory, or choose one with **Browse**. Symlink Creator creates one link for each source in this directory.
+3. Choose the options you need:
+   - Use relative paths when the source and destination are on the same drive.
+   - Retain the generated command script on the Desktop after execution.
+   - Hide the success dialog for unattended or repeated operations.
+4. Select **Create symlinks**. Windows may ask for administrator permission.
 
-- At the `Source file or folder list`, you can add files or folders which will be copied in the `Destination path` as symlinks.
-- Using Symlink Creator's drag-n-drop feature, you can easily create multiple symlinks at a time.
-  - You can drag-n-drop files/folders directly from File Explorer.
-  - You can also drag-n-drop the text containing a list of file/folder paths separated by a new line such as:
-  ```
-  D:\TestingSymlinkCreator/Src/MyFile1.txt
-  D:\TestingSymlinkCreator/Src/MyFile2.txt
-  ```
-- Tick the `Use relative path if possible` option to use relative paths while creating symlinks. In this case, relative paths will be used if both source files/folders and destination files/folders are in the same drive.
-- Tick the `Retain script file on Desktop after execution` option to keep the generated command script for logging or other advanced use.
-- Tick the `Hide successful operation dialog` option if you want to only show a dialog when an error occurs.
+Example newline-separated input:
+
+```text
+D:\TestingSymlinkCreator\Src\MyFile1.txt
+D:\TestingSymlinkCreator\Src\MyFile2.txt
+```
 
 ### Shortcut options
 
@@ -105,9 +132,17 @@ Copy the path that this command returns into the shortcut target, followed by th
 
 The three preference options apply only to that launch and can still be changed using the checkboxes. Language selection and elevation-warning suppression are startup-only options.
 
-## Why Symlink Creator needs administrative rights
+## Administrative rights
 
-It has been stated before that Symlink Creator uses the `mklink` command to create symlinks. The `mklink` command requires administrative privilege to create symlinks. You can find more information [here](https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/create-symbolic-links).
+Windows may ask for administrator permission when Symlink Creator creates symbolic links because the Windows `mklink` command requires the `Create symbolic links` user right. If the app is running as administrator, File Explorer may prevent drag-and-drop; run it without elevation when you need to drag paths into the app. See the [Windows security policy documentation](https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/create-symbolic-links) for details.
+
+## Development
+
+Build, test, and release instructions are available in the [development and release guide](docs/Development.md).
+
+## License
+
+Symlink Creator is available under the [MIT License](LICENSE).
 
 ## Support Symlink Creator
 
