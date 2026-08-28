@@ -4,18 +4,18 @@
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Release](https://img.shields.io/github/v/release/arnobpl/SymlinkCreator)](https://github.com/arnobpl/SymlinkCreator/releases/latest)
 
-Symlink Creator is a free, open-source Windows GUI for creating multiple file and folder symbolic links (symlinks) at once. Add any number of existing source paths, choose one destination folder, and let the app run the required Windows [`mklink`](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/mklink) commands—without writing a batch script by hand.
+Symlink Creator is a free, open-source Windows GUI for creating multiple file and folder symbolic links (symlinks) at once. Add multiple existing source paths, choose one destination folder, and let the app create the links for you without writing [`mklink`](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/mklink) commands or batch scripts by hand.
 
 ![Symlink Creator showing multiple source paths and one destination folder](docs/assets/Screenshot.png "Symlink Creator for Windows")
 
-**Built for batch workflows:** many sources → one destination folder → one symbolic link per source.
+**Batch workflow:** many sources → one destination folder → one link per source.
 
 ## Features
 
 - **Batch symlink creation:** turn multiple source files and folders into links in one destination folder with a single operation.
 - **Flexible input:** select files or folders, drag them from File Explorer, or drop text containing one path per line.
 - **Target path control:** use relative targets when the source and destination are on the same drive, or use absolute targets when the links must remain independent of the destination's location.
-- **Transparent execution:** optionally retain the generated `.cmd` file on the Desktop for review or troubleshooting.
+- **Reviewable commands:** optionally retain the generated `.cmd` file on the Desktop for review or troubleshooting.
 - **Reusable startup options:** preselect language, path behavior, script retention, and success-dialog behavior from a Windows shortcut.
 - **Localized interface:** available in English, Bengali, German, Spanish, French, Japanese, Korean, Brazilian Portuguese, and Simplified Chinese.
 - **Modern Windows support:** install through WinGet or download x64 and native ARM64 packages for Windows 10 and Windows 11.
@@ -134,7 +134,7 @@ The three preference options apply only to that launch and can still be changed 
 
 ## Administrative rights
 
-Windows may ask for administrator permission when Symlink Creator creates symbolic links because the Windows `mklink` command requires the `Create symbolic links` user right. If the app is running as administrator, File Explorer may prevent drag-and-drop; run it without elevation when you need to drag paths into the app. See the [Windows security policy documentation](https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/create-symbolic-links) for details.
+Windows controls symbolic link creation through the **Create symbolic links** user right. Symlink Creator runs its generated `mklink` script with elevated permissions, so Windows may prompt for administrator permission when creating links. If the app is running as administrator, File Explorer may prevent drag-and-drop. Run it without elevation when you need to drag paths into the app. See the [Windows security policy documentation](https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/create-symbolic-links) for details.
 
 ## Development
 
