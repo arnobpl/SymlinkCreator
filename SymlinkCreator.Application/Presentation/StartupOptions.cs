@@ -1,12 +1,22 @@
 namespace SymlinkCreator.Application.Presentation;
 
+public enum ThemePreference
+{
+    Light,
+    Dark
+}
+
 public sealed record StartupOptions(
     bool SuppressElevationWarning = false,
     bool UseRelativePath = true,
     bool RetainScriptFile = false,
     bool HideSuccessfulOperationDialog = false,
-    string? Language = null)
+    string? Language = null,
+    ThemePreference? Theme = null)
 {
+    private const string LanguageOption = "--language";
+    private const string ThemeOption = "--theme";
+
     private static readonly HashSet<string> SupportedLanguages =
         new(StringComparer.OrdinalIgnoreCase)
         {
@@ -42,6 +52,7 @@ public sealed record StartupOptions(
         bool retainScriptFile = false;
         bool hideSuccessfulOperationDialog = false;
         string? language = null;
+        ThemePreference? theme = null;
 
         string[] arguments = [.. tokens];
         for (int index = 0; index < arguments.Length; index++)
@@ -49,40 +60,39 @@ public sealed record StartupOptions(
             string argument = arguments[index];
             string normalizedArgument = argument.ToLowerInvariant();
 
-            if (normalizedArgument.StartsWith("--language=", StringComparison.Ordinal))
+            if (TryReadValueOption(arguments, ref index, LanguageOption, out string? languageValue))
             {
-                language = NormalizeLanguage(argument["--language=".Length..]);
-                continue;
-            }
-
-            if (normalizedArgument == "--language")
-            {
-                if (
-                    index + 1 < arguments.Length &&
-                    !arguments[index + 1].StartsWith("--", StringComparison.Ordinal))
+                if (languageValue is not null)
                 {
-                    language = NormalizeLanguage(arguments[++index]);
+                    language = NormalizeLanguage(languageValue);
                 }
-
-                continue;
             }
-
-            switch (normalizedArgument)
+            else if (TryReadValueOption(arguments, ref index, ThemeOption, out string? themeValue))
             {
-                case "--no-elevation-warning":
-                    suppressElevationWarning = true;
-                    break;
-                case "--absolute-paths":
-                    useRelativePath = false;
-                    break;
-                case "--retain-script":
-                    retainScriptFile = true;
-                    break;
-                case "--hide-success-dialog":
-                    hideSuccessfulOperationDialog = true;
-                    break;
-                default:
-                    break;
+                if (themeValue is not null)
+                {
+                    theme = NormalizeTheme(themeValue);
+                }
+            }
+            else
+            {
+                switch (normalizedArgument)
+                {
+                    case "--no-elevation-warning":
+                        suppressElevationWarning = true;
+                        break;
+                    case "--absolute-paths":
+                        useRelativePath = false;
+                        break;
+                    case "--retain-script":
+                        retainScriptFile = true;
+                        break;
+                    case "--hide-success-dialog":
+                        hideSuccessfulOperationDialog = true;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -91,7 +101,42 @@ public sealed record StartupOptions(
             useRelativePath,
             retainScriptFile,
             hideSuccessfulOperationDialog,
-            language);
+            language,
+            theme);
+    }
+
+    private static bool TryReadValueOption(
+        string[] arguments,
+        ref int index,
+        string optionName,
+        out string? value)
+    {
+        string argument = arguments[index];
+        string optionWithEquals = string.Concat(optionName, "=");
+
+        if (argument.StartsWith(optionWithEquals, StringComparison.OrdinalIgnoreCase))
+        {
+            value = argument[optionWithEquals.Length..];
+            return true;
+        }
+
+        if (!string.Equals(argument, optionName, StringComparison.OrdinalIgnoreCase))
+        {
+            value = null;
+            return false;
+        }
+
+        if (index + 1 < arguments.Length &&
+            !arguments[index + 1].StartsWith("--", StringComparison.Ordinal))
+        {
+            value = arguments[++index];
+        }
+        else
+        {
+            value = null;
+        }
+
+        return true;
     }
 
     private static string? NormalizeLanguage(string value)
@@ -100,5 +145,15 @@ public sealed record StartupOptions(
         return SupportedLanguages.TryGetValue(candidate, out string? language)
             ? language
             : null;
+    }
+
+    private static ThemePreference? NormalizeTheme(string value)
+    {
+        return value.Trim().Trim('"').ToLowerInvariant() switch
+        {
+            "light" => ThemePreference.Light,
+            "dark" => ThemePreference.Dark,
+            _ => null
+        };
     }
 }

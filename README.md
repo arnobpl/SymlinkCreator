@@ -16,7 +16,7 @@ Symlink Creator is a free, open-source Windows GUI for creating multiple file an
 - **Flexible input:** select files or folders, drag them from File Explorer, or drop text containing one path per line.
 - **Target path control:** use relative targets when the source and destination are on the same drive, or use absolute targets when the links must remain independent of the destination's location.
 - **Reviewable commands:** optionally retain the generated `.cmd` file on the Desktop for review or troubleshooting.
-- **Reusable startup options:** preselect language, path behavior, script retention, and success-dialog behavior from a Windows shortcut.
+- **Reusable startup options:** preselect language, theme, path behavior, script retention, and success-dialog behavior from a Windows shortcut.
 - **Localized interface:** available in English, Bengali, German, Spanish, French, Japanese, Korean, Brazilian Portuguese, and Simplified Chinese.
 - **Modern Windows support:** install through WinGet or download x64 and native ARM64 packages for Windows 10 and Windows 11.
 - **Free and open source:** released under the [MIT License](LICENSE).
@@ -114,6 +114,7 @@ You can append these startup options to a Windows shortcut's target to configure
 
 - `--no-elevation-warning` prevents the warning about drag-and-drop potentially not working when Symlink Creator is launched as administrator. It does not disable the administrator prompt required to create symlinks.
 - `--language <tag>` selects the app language for that launch. Use one of the locale-folder names under [`SymlinkCreator.UI/Strings`](SymlinkCreator.UI/Strings), such as `zh-CN`, `ja-JP`, `pt-BR`, or `ko-KR`. Windows language settings are unchanged.
+- `--theme <dark|light>` overrides the Windows theme for that launch. The equals form such as `--theme=dark` is also supported. Omitting the option keeps following the Windows theme.
 - `--absolute-paths` makes each symlink point to the source using its complete path, even when a shorter relative path could be used. This keeps the link target independent of the destination folder's location.
 - `--retain-script` keeps the generated `.cmd` file on the Desktop after symlink creation. The file contains the Windows commands used by Symlink Creator and can be reviewed for troubleshooting or advanced use.
 - `--hide-success-dialog` skips the confirmation dialog after symlink creation succeeds. Error and canceled-operation dialogs are still shown.
@@ -127,10 +128,10 @@ where.exe symlinkcreator
 Copy the path that this command returns into the shortcut target, followed by the desired options. For example:
 
 ```text
-"C:\Users\<username>\AppData\Local\Microsoft\WinGet\Links\symlinkcreator.exe" --language zh-CN --absolute-paths --retain-script --hide-success-dialog
+"C:\Users\<username>\AppData\Local\Microsoft\WinGet\Links\symlinkcreator.exe" --language zh-CN --theme dark --absolute-paths --retain-script --hide-success-dialog
 ```
 
-The three preference options apply only to that launch and can still be changed using the checkboxes. Language selection and elevation-warning suppression are startup-only options.
+The three checkbox preferences apply only to that launch and can still be changed using the checkboxes. Theme selection, language selection, and elevation-warning suppression are startup-only options.
 
 ## Administrative rights
 

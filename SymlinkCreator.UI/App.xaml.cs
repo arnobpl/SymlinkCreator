@@ -11,6 +11,7 @@ namespace SymlinkCreator;
 public partial class App : Microsoft.UI.Xaml.Application
 {
     private Window? _window;
+    private readonly StartupOptions _startupOptions;
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly MrtCoreStringResourceService _resources;
 
@@ -20,7 +21,18 @@ public partial class App : Microsoft.UI.Xaml.Application
     /// </summary>
     public App()
     {
+        _startupOptions = StartupOptions.ParseCommandLineArguments(
+            Environment.GetCommandLineArgs().Skip(1));
+
         InitializeComponent();
+
+        // Application.RequestedTheme can only be set during application startup.
+        if (_startupOptions.Theme is ThemePreference theme)
+        {
+            RequestedTheme = theme == ThemePreference.Dark
+                ? ApplicationTheme.Dark
+                : ApplicationTheme.Light;
+        }
 
         var workspace = new ScriptWorkspace();
         var symlinkOperations = new SymlinkOperationService(
@@ -40,14 +52,12 @@ public partial class App : Microsoft.UI.Xaml.Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         _ = args;
-        var startupOptions = StartupOptions.ParseCommandLineArguments(
-            Environment.GetCommandLineArgs().Skip(1));
-        _resources.SetLanguage(startupOptions.Language);
-        _mainWindowViewModel.ApplyStartupOptions(startupOptions);
+        _resources.SetLanguage(_startupOptions.Language);
+        _mainWindowViewModel.ApplyStartupOptions(_startupOptions);
         _window = new MainWindow(
             _mainWindowViewModel,
             _resources,
-            startupOptions);
+            _startupOptions);
         _window.Activate();
     }
 }
