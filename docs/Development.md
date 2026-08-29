@@ -62,7 +62,7 @@ Run cleanup after closing the application and stopping any local ZIP server.
 
 ## Test a packaged application
 
-The release ZIP is framework-dependent. Before launching one directly, install the .NET runtime, Windows App Runtime, and Visual C++ runtime described in the [manual ZIP prerequisites](../README.md#manual-zip-prerequisites).
+The release ZIP is framework-dependent. Before launching one directly, install the .NET runtime, Windows App Runtime, and Visual C++ runtime described under [manual download](../README.md#manual-download).
 
 From a normal, unelevated PowerShell window, build and verify both ZIPs, then extract and launch the package for the current architecture:
 

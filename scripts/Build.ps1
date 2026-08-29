@@ -12,6 +12,85 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+function Invoke-DotNetFormatStyle {
+    [CmdletBinding()]
+    param(
+        [switch] $VerifyNoChanges
+    )
+
+    $previousPlatform = $env:Platform
+    $previousConfiguration = $env:Configuration
+    try {
+        $env:Platform = $TargetPlatform
+        $env:Configuration = $Configuration
+
+        $arguments = @('format', 'style', '.\SymlinkCreator.sln', '--no-restore')
+        if ($VerifyNoChanges) {
+            $arguments += '--verify-no-changes'
+        }
+
+        $arguments += @('--severity', 'info', '--verbosity', 'minimal')
+        $formatOutput = [System.Collections.Generic.List[object]]::new()
+        & dotnet @arguments 2>&1 |
+            ForEach-Object {
+                $formatOutput.Add($_)
+                Write-Output $_
+            }
+        $formatExitCode = $LASTEXITCODE
+    }
+    finally {
+        $env:Platform = $previousPlatform
+        $env:Configuration = $previousConfiguration
+    }
+
+    if ($formatExitCode -ne 0) {
+        throw "dotnet format style failed with exit code $formatExitCode."
+    }
+
+    # dotnet format can return zero after failing to load a project, leaving
+    # its analyzers with incomplete workspace data. Treat those diagnostics as
+    # a failure instead of reporting a false success.
+    $workspaceLoadDiagnostics = @(
+        $formatOutput |
+            ForEach-Object { $_.ToString() } |
+            Where-Object {
+                $_ -match '^\s*Warnings were encountered while loading the workspace\.' -or
+                $_ -match '^\s*MSBuild failed when processing the file .* with message:' -or
+                $_ -match '^\s*Required references did not load' -or
+                $_ -match '^\s*Found project reference without a matching metadata reference:'
+            }
+    )
+    if ($workspaceLoadDiagnostics.Count -ne 0) {
+        $diagnosticSummary = $workspaceLoadDiagnostics -join [Environment]::NewLine
+        throw "dotnet format style could not load the solution workspace:`n$diagnosticSummary"
+    }
+}
+
+function Invoke-SolutionRestore {
+    [CmdletBinding()]
+    param()
+
+    & dotnet restore .\SymlinkCreator.sln `
+        -p:Configuration=$Configuration `
+        -p:Platform=$TargetPlatform
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet restore failed with exit code $LASTEXITCODE."
+    }
+}
+
+function Invoke-SolutionBuild {
+    [CmdletBinding()]
+    param()
+
+    & dotnet build .\SymlinkCreator.sln `
+        --configuration $Configuration `
+        --no-restore `
+        -p:Platform=$TargetPlatform
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet build failed with exit code $LASTEXITCODE."
+    }
+}
+
 $scriptSupportModulePath = Join-Path $PSScriptRoot 'ScriptSupport.psm1'
 Import-Module -Name $scriptSupportModulePath -Force
 $hostPlatform = Get-HostPlatform
@@ -63,12 +142,7 @@ try {
         Write-Information "Fixing $Configuration for $TargetPlatform..." -InformationAction Continue
 
         Write-Information 'Restoring projects for formatting...' -InformationAction Continue
-        & dotnet restore .\SymlinkCreator.sln `
-            -p:Configuration=$Configuration `
-            -p:Platform=$TargetPlatform
-        if ($LASTEXITCODE -ne 0) {
-            throw "dotnet restore failed with exit code $LASTEXITCODE."
-        }
+        Invoke-SolutionRestore
 
         Write-Information 'Formatting PowerShell scripts...' -InformationAction Continue
         Import-Module PSScriptAnalyzer -Force
@@ -90,25 +164,11 @@ try {
             throw "dotnet format whitespace failed with exit code $LASTEXITCODE."
         }
 
+        Write-Information 'Building projects for style analysis...' -InformationAction Continue
+        Invoke-SolutionBuild
+
         Write-Information 'Formatting C# style...' -InformationAction Continue
-        $previousPlatform = $env:Platform
-        $previousConfiguration = $env:Configuration
-        try {
-            $env:Platform = $TargetPlatform
-            $env:Configuration = $Configuration
-            & dotnet format style .\SymlinkCreator.sln `
-                --no-restore `
-                --severity info `
-                --verbosity minimal
-            $styleExitCode = $LASTEXITCODE
-        }
-        finally {
-            $env:Platform = $previousPlatform
-            $env:Configuration = $previousConfiguration
-        }
-        if ($styleExitCode -ne 0) {
-            throw "C# style formatting failed with exit code $styleExitCode."
-        }
+        Invoke-DotNetFormatStyle
 
         Write-Information 'Fix pass complete. Run .\scripts\Build.ps1 -Verify to validate the result.' -InformationAction Continue
         return
@@ -143,42 +203,13 @@ try {
     }
 
     Write-Information 'Restoring projects...' -InformationAction Continue
-    & dotnet restore .\SymlinkCreator.sln `
-        -p:Configuration=$Configuration `
-        -p:Platform=$TargetPlatform
-    if ($LASTEXITCODE -ne 0) {
-        throw "dotnet restore failed with exit code $LASTEXITCODE."
-    }
+    Invoke-SolutionRestore
 
     Write-Information 'Building and linting projects...' -InformationAction Continue
-    & dotnet build .\SymlinkCreator.sln `
-        --configuration $Configuration `
-        --no-restore `
-        -p:Platform=$TargetPlatform
-    if ($LASTEXITCODE -ne 0) {
-        throw "dotnet build failed with exit code $LASTEXITCODE."
-    }
+    Invoke-SolutionBuild
 
     Write-Information 'Verifying C# style...' -InformationAction Continue
-    $previousPlatform = $env:Platform
-    $previousConfiguration = $env:Configuration
-    try {
-        $env:Platform = $TargetPlatform
-        $env:Configuration = $Configuration
-        & dotnet format style .\SymlinkCreator.sln `
-            --no-restore `
-            --verify-no-changes `
-            --severity info `
-            --verbosity minimal
-        $styleExitCode = $LASTEXITCODE
-    }
-    finally {
-        $env:Platform = $previousPlatform
-        $env:Configuration = $previousConfiguration
-    }
-    if ($styleExitCode -ne 0) {
-        throw "C# style verification failed with exit code $styleExitCode."
-    }
+    Invoke-DotNetFormatStyle -VerifyNoChanges
 
     if ($TargetPlatform -eq $hostPlatform) {
         Write-Information 'Running tests...' -InformationAction Continue
