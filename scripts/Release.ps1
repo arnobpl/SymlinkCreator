@@ -474,19 +474,43 @@ function Get-GitHubRelease {
 }
 
 function Get-GitHubTagCommit {
-    $response = @(& gh api "repos/$repositoryName/commits/$tag" --jq '.sha' 2>&1)
-    $responseText = ($response | ForEach-Object ToString) -join "`n"
-    if ($LASTEXITCODE -eq 0) {
-        $commit = $responseText.Trim()
-        if ($commit -notmatch '^[0-9a-fA-F]{40,64}$') {
-            throw "GitHub release tag '$tag' resolved to an invalid commit '$commit'."
+    $referenceResponse = @(& gh api "repos/$repositoryName/git/ref/tags/$tag" --jq `
+            '{type: .object.type, sha: .object.sha}' 2>&1)
+    $referenceResponseText = ($referenceResponse | ForEach-Object ToString) -join "`n"
+    if ($LASTEXITCODE -ne 0) {
+        if ($referenceResponseText -match '(?i)HTTP 404|"status"\s*:\s*"?404"?') {
+            return $null
         }
-        return $commit
+        throw "Unable to resolve GitHub release tag '$tag': $referenceResponseText"
     }
-    if ($responseText -match '(?i)HTTP 404|"status"\s*:\s*"?404"?') {
-        return $null
+
+    $reference = $referenceResponseText | ConvertFrom-Json
+    $referenceType = [string] $reference.type
+    $referenceSha = [string] $reference.sha
+    if ($referenceSha -notmatch '^[0-9a-fA-F]{40,64}$') {
+        throw "GitHub release tag '$tag' resolved to an invalid $referenceType object '$referenceSha'."
     }
-    throw "Unable to resolve GitHub release tag '$tag': $responseText"
+    if ($referenceType -ieq 'commit') {
+        return $referenceSha
+    }
+    if ($referenceType -ine 'tag') {
+        throw "GitHub release tag '$tag' resolved to unsupported Git object type '$referenceType'."
+    }
+
+    $tagObjectResponse = @(& gh api "repos/$repositoryName/git/tags/$referenceSha" --jq `
+            '{type: .object.type, sha: .object.sha}' 2>&1)
+    $tagObjectResponseText = ($tagObjectResponse | ForEach-Object ToString) -join "`n"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to dereference GitHub release tag '$tag': $tagObjectResponseText"
+    }
+
+    $tagObject = $tagObjectResponseText | ConvertFrom-Json
+    $tagObjectType = [string] $tagObject.type
+    $tagCommit = [string] $tagObject.sha
+    if ($tagObjectType -ine 'commit' -or $tagCommit -notmatch '^[0-9a-fA-F]{40,64}$') {
+        throw "GitHub release tag '$tag' did not resolve to a valid commit."
+    }
+    return $tagCommit
 }
 
 function Invoke-GitHubReleaseTagReplacement {
