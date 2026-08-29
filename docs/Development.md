@@ -34,13 +34,13 @@ Build the Release configuration for the current architecture:
 .\scripts\Build.ps1
 ```
 
-Apply available PowerShell and C# formatting fixes:
+Apply available PowerShell and C# formatting and style fixes:
 
 ```powershell
 .\scripts\Build.ps1 -Fix
 ```
 
-Run the full repository verification gate: formatting and style checks, script analysis, restore, build, and host-compatible tests:
+Run the full repository verification gate: PowerShell linting, C# formatting and style checks, dependency restore, build, and tests when the target architecture matches the host:
 
 ```powershell
 .\scripts\Build.ps1 -Verify
@@ -64,7 +64,7 @@ Run cleanup after closing the application and stopping any local ZIP server.
 
 The release ZIP is framework-dependent. Before launching one directly, install the .NET runtime, Windows App Runtime, and Visual C++ runtime described in the [manual ZIP prerequisites](../README.md#manual-zip-prerequisites).
 
-Build and verify both architecture ZIPs, then freshly extract and launch the package matching the current computer:
+From a normal, unelevated PowerShell window, build and verify both ZIPs, then extract and launch the package for the current architecture:
 
 ```powershell
 .\scripts\Release.ps1 -LaunchForManualTest
@@ -113,7 +113,7 @@ If port `8765` is already in use, choose another loopback port:
 .\scripts\Test-LocalWinGetManifest.ps1 -Port 8876
 ```
 
-If WinGet is unavailable, use `Release.ps1` for package/archive validation; the local WinGet integration test cannot run without WinGet.
+If WinGet is unavailable, use `Release.ps1` for package and archive validation; the local WinGet integration test cannot run without WinGet.
 
 ## Version a release
 
@@ -151,8 +151,8 @@ Without `-ReleaseNotesPath`, the script passes GitHub CLI the fixed fallback tex
     -ReleaseNotesPath "$env:USERPROFILE\Downloads\release.md"
 ```
 
-`-SkipWinGetValidation` is only for non-publishing package/archive checks and cannot be combined with `-Publish`. `-ReplaceExistingRelease` is an advanced recovery option for intentionally replacing an existing GitHub release.
+`-SkipWinGetValidation` is only for non-publishing package and archive checks and cannot be combined with `-Publish`. `-ReplaceExistingRelease` is an advanced recovery option for intentionally replacing an existing GitHub release.
 
 If WinGet submission fails after the GitHub release is created, rerun the same publish command. The script verifies the existing release and resumes the WinGet submission instead of creating a duplicate release.
 
-Do not use `-Publish` during normal development. GitHub Actions runs the lint, build, test, and local release-package verification; it does not publish releases or submit WinGet PRs.
+Do not use `-Publish` during normal development. GitHub Actions runs the repository verification gate and checks the release packages without running WinGet CLI validation; it does not publish releases or submit WinGet PRs.
