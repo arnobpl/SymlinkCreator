@@ -47,10 +47,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="$(PinnedWindowsSdkBuildToolsVersion)" />
     <!-- Keep this deliberate modular set aligned with the WinGet runtime dependency; the umbrella package adds unused AI/ML/Search/Widgets payloads. -->
-    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.2.1" />
-    <PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.1.0" />
-    <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.0.15" />
-    <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.2.0" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.6" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.3.9" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.1.6" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.4.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SymlinkCreator.Application\SymlinkCreator.Application.csproj" />
