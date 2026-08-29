@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Windowing;
 using Microsoft.Windows.Storage.Pickers;
 using SymlinkCreator.Application.Core;
 using SymlinkCreator.Application.Platform;
@@ -35,7 +36,7 @@ public sealed partial class MainWindow : Window, IDisposable
         _suppressElevationWarning = startupOptions.SuppressElevationWarning;
 
         InitializeComponent();
-        ConfigureWindow();
+        ConfigureWindow(startupOptions.Theme);
         AddFilesButton.Click += AddFilesButton_Click;
         AddFoldersButton.Click += AddFoldersButton_Click;
         RemoveSelectedButton.Click += RemoveSelectedButton_Click;
@@ -59,8 +60,18 @@ public sealed partial class MainWindow : Window, IDisposable
 
     public IStringResourceService StringResources { get; }
 
-    private void ConfigureWindow()
+    private void ConfigureWindow(ThemePreference? theme)
     {
+        if (AppWindowTitleBar.IsCustomizationSupported())
+        {
+            AppWindow.TitleBar.PreferredTheme = theme switch
+            {
+                ThemePreference.Dark => TitleBarTheme.Dark,
+                ThemePreference.Light => TitleBarTheme.Light,
+                _ => TitleBarTheme.UseDefaultAppMode
+            };
+        }
+
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
 
@@ -73,7 +84,7 @@ public sealed partial class MainWindow : Window, IDisposable
         AppTitleBarText.Text = windowTitle;
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "MainIcon.ico"));
 
-        if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.IsMaximizable = false;
             presenter.PreferredMinimumWidth = 1100;
