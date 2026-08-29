@@ -11,6 +11,10 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+$isWhatIf = $WhatIfPreference
+
+# The preview covers external publication only; local packaging and validation must still run fully.
+$WhatIfPreference = $false
 
 if ($LaunchForManualTest -and $Publish) {
     throw 'Use -LaunchForManualTest for local testing or -Publish for publication; do not combine them.'
@@ -689,13 +693,24 @@ try {
 
     $release = Invoke-ReleasePackaging
     Test-ReleaseBundle -Release $release
-    Complete-ReleaseBundle -Release $release
+    if ($isWhatIf) {
+        Write-Information 'What if: Skipping promotion of release artifacts.' -InformationAction Continue
+    }
+    else {
+        Complete-ReleaseBundle -Release $release
+    }
 
     if ($Publish) {
-        if ($PSCmdlet.ShouldProcess(
-                "$repositoryName and microsoft/winget-pkgs",
-                "publish GitHub release $tag and submit its WinGet manifest")) {
-            Publish-Release -Release $release -WinGetCreate $wingetCreate -NotesPath $resolvedReleaseNotesPath
+        $WhatIfPreference = $isWhatIf
+        try {
+            if ($PSCmdlet.ShouldProcess(
+                    "$repositoryName and microsoft/winget-pkgs",
+                    "publish GitHub release $tag and submit its WinGet manifest")) {
+                Publish-Release -Release $release -WinGetCreate $wingetCreate -NotesPath $resolvedReleaseNotesPath
+            }
+        }
+        finally {
+            $WhatIfPreference = $false
         }
         return
     }
@@ -707,5 +722,6 @@ finally {
     if (Test-Path -LiteralPath $stagingDirectory) {
         Remove-Item -LiteralPath $stagingDirectory -Recurse -Force -ErrorAction SilentlyContinue
     }
+    $WhatIfPreference = $isWhatIf
     Pop-Location
 }
