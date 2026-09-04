@@ -3,6 +3,7 @@
 [![CI](https://github.com/arnobpl/SymlinkCreator/actions/workflows/ci.yml/badge.svg)](https://github.com/arnobpl/SymlinkCreator/actions/workflows/ci.yml)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Release](https://img.shields.io/github/v/release/arnobpl/SymlinkCreator)](https://github.com/arnobpl/SymlinkCreator/releases/latest)
+[![Website](https://img.shields.io/badge/Website-arnobpl.org-176DC1)](https://arnobpl.org/symlink-creator/)
 
 Symlink Creator is a free, open-source Windows GUI for creating multiple file and folder symbolic links (symlinks) at once. Add multiple existing source paths, choose one destination folder, and let the app create the links for you without writing [`mklink`](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/mklink) commands or batch scripts by hand.
 
@@ -23,16 +24,16 @@ Symlink Creator is a free, open-source Windows GUI for creating multiple file an
 
 ## Get Symlink Creator
 
-[![Install with WinGet](https://img.shields.io/badge/Install-WinGet-blue?style=for-the-badge&logo=windows)](https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/ArnobPaul/SymlinkCreator)
-[![Download ZIP](https://img.shields.io/badge/Download-ZIP-blue?style=for-the-badge&logo=github)](https://github.com/arnobpl/SymlinkCreator/releases/latest)
+### Install via WinGet
 
-### Recommended: Install via WinGet
+> [!TIP]
+> **Recommended:** WinGet installs the required dependencies and adds the `symlinkcreator` command alias.
 
 ```powershell
 winget install --id ArnobPaul.SymlinkCreator --exact
 ```
 
-WinGet installs Symlink Creator with its required dependencies and adds a command alias:
+After installation, launch Symlink Creator from PowerShell:
 
 ```powershell
 symlinkcreator
@@ -46,8 +47,12 @@ symlinkcreator
 
 🗂️ [View all releases](https://github.com/arnobpl/SymlinkCreator/releases)
 
+Not sure which ZIP to choose? Open **Settings → System → About** and check **System type**. Choose x64 for an x64-based processor or ARM64 for an ARM-based processor.
+
+#### Manual ZIP prerequisites
+
 <details>
-<summary><strong>Manual ZIP prerequisites</strong></summary>
+<summary>Show prerequisite commands</summary>
 
 Before running the framework-dependent ZIP, install its prerequisites:
 
@@ -147,9 +152,9 @@ Symlink Creator is available under the [MIT License](LICENSE).
 
 ## Support Symlink Creator
 
-Symlink Creator is a simple tool, but if it has saved you time or made things a bit easier, consider supporting the project. Every contribution helps keep it going and encourages future improvements.
+Symlink Creator is free and open source. If it saves you time, you can support its continued maintenance.
 
-<a href='https://ko-fi.com/O4O01L2D7P' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+<a href="https://ko-fi.com/arnobpl" target="_blank" rel="noopener"><img src="https://storage.ko-fi.com/cdn/kofi6.png?v=6" height="36" alt="Support Symlink Creator on Ko-fi"></a>
 
 You can donate via [PayPal](https://paypal.me/arnobpl).
 
@@ -182,6 +187,6 @@ You can also send crypto tokens to the following addresses:
   </tbody>
 </table>
 
-If donating is not an option, simply starring the repo, sharing feedback, or spreading the word is equally appreciated. Thank you for using Symlink Creator and sharing your thoughts.
+You can also support the project by starring the repository, sharing feedback, or telling others about Symlink Creator. Thank you for using Symlink Creator and sharing your thoughts.
 
 Happy Symlinking!
